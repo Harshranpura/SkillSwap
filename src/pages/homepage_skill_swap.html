@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSwap - Home</title>
+    <!-- Preconnect and Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Limelight&family=Rouge+Script&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #121212, #1e1e1e); /* Black and dark gray gradient */
+            color: white;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-family: "Playfair Display", serif; /* Playfair Display Font */
+            font-optical-sizing: auto;
+            font-weight: 700; /* Adjusted weight for bold emphasis */
+            font-size: 3.5rem; /* Increased font size for prominence */
+            color: #fff;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            gap: 0.5rem; /* Reduced gap between buttons */
+        }
+
+        /* Button Styles */
+        button {
+            background: #fff;
+            border: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 600;
+            width: 120px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transform: skew(-21deg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button span {
+            display: inline-block;
+            transform: skew(21deg);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            left: 0;
+            background: rgb(20, 20, 20);
+            opacity: 0;
+            z-index: -1;
+            transition: all 0.5s;
+        }
+
+        button:hover {
+            color: #fff;
+        }
+
+        button:hover::before {
+            left: 0;
+            right: 0;
+            opacity: 1;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-family: "Limelight", serif; /* Applied Limelight font */
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .hero p {
+            font-size: 1.5rem; /* Slightly increased size for better emphasis */
+            margin-bottom: 2rem;
+            font-family: "Rouge Script", serif; /* Applied Rouge Script font */
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .cta-buttons a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #FF512F, #DD2476);
+            margin: 0 0.5rem;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .cta-buttons a:hover {
+            transform: scale(1.1);
+        }
+
+        /* Button Custom Style from Uiverse.io */
+        .cta-buttons .get-started-button {
+    position: relative;
+    display: flex; /* Enables flexbox */
+    align-items: center; /* Centers text vertically */
+    justify-content: center; /* Aligns text to the left */
+    background: #27272a;
+    border: 1px solid #27272a;
+    text-align: left;
+    padding: 0.5rem 1.5rem; /* Adjust spacing for text */
+    color: #f5f5f5;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 190px;
+    height: 40px;
+    margin: auto;
+}
+
+
+        .cta-buttons .get-started-button::before,
+        .cta-buttons .get-started-button::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: all 0.5s;
+            transform: scale(0);
+            z-index: 1;
+        }
+
+        .cta-buttons .get-started-button::before {
+            background: #a21caf;
+            box-shadow: 0 0 20px 30px #a21caf;
+            top: -50%;
+            left: -50%;
+        }
+
+        .cta-buttons .get-started-button::after {
+            background: #ffb6c1;
+            box-shadow: 0 0 30px 20px #ffb6c1;
+            bottom: -50%;
+            right: -50%;
+        }
+
+        .cta-buttons .get-started-button:hover::before,
+        .cta-buttons .get-started-button:hover::after {
+            transform: scale(1.5);
+        }
+
+        .cta-buttons .get-started-button span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            padding: 3rem 2rem;
+            gap: 4rem; /* Adjusted gap for better spacing */
+        }
+
+        .container {
+            position: relative;
+            width: 220px; /* Increased card width */
+            height: 300px; /* Increased card height */
+            margin: 0 5px;
+            transition: 200ms;
+        }
+
+        .container:hover #card {
+            transform: scale(1.05); /* Slight zoom effect */
+            animation: glowingEffect 2s infinite; /* Glowing animation on hover */
+        }
+
+        #card {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
+            transition: 700ms;
+            background: linear-gradient(45deg, #1a1a1a, #262626);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes glowingEffect {
+            0% {
+                box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 170, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+            }
+        }
+
+        .card-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .title {
+            opacity: 1; /* Always visible */
+            position: absolute;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-align: center;
+            top: 40px; /* Adjusted closer to center */
+            width: 100%;
+            text-transform: uppercase; /* Added uppercase for headings */
+            background: linear-gradient(45deg, #00ffaa, #00a2ff);
+            -webkit-background-clip: text;
+            background-clip: text; /* For compatibility */
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(92, 103, 255, 0.5), 0 0 20px rgba(92, 103, 255, 0.3);
+        }
+
+        .subtitle {
+            opacity: 0; /* Hidden by default */
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transform: translateY(30px);
+            color: rgba(255, 255, 255, 0.6);
+            transition: opacity 300ms ease-in-out;
+        }
+
+        .container:hover .subtitle {
+            opacity: 1; /* Show subtitle on hover */
+        }
+
+        .highlight {
+            color: #00ffaa;
+            margin-left: 5px;
+            background: linear-gradient(90deg, #5c67ff, #ad51ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-left">
+            <a href="login.html">
+            <button><span>Login</span></button>
+            </a>
+            <a href="register.html">
+            <button><span>Register</span></button>
+            </a>
+        </div>
+        <div class="logo">SkillSwap</div>
+        <div class="nav-right">
+            <button><span>Home</span></button>
+            <a href="about.html">
+            <button><span>About</span></button>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="limelight-regular">Barter Your Skills, Build Connections</h1>
+            <p class="rouge-script-regular">Find the perfect skill exchange partner today. Collaborate, grow, and succeed together.</p>
+            <div class="cta-buttons">
+                <a href="register.html" class="get-started-button">
+                    <span>Get Started</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="features">
+            <!-- Card 1 -->
+            <div class="container noselect">
+                <div id="card">
+                    <div class="card-content">
+                        <div class="title">Search for Skills</div>
+                        <div class="subtitle">
+                            Easily find individuals
+                            <span class="highlight">with the skills you need</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="container noselect">
+                <div id="card">
+                    <div class="card-content">
+                        <div class="title">Exchange Services</div>
+                        <div class="subtitle">
+                            Collaborate by swapping
+                            <span class="highlight">services without money</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="container noselect">
+                <div id="card">
+                    <div class="card-content">
+                        <div class="title">Build Trust</div>
+                        <div class="subtitle">
+                            Leave reviews and
+                            <span class="highlight">build a trusted community</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SkillSwap. All rights reserved.</p>
+        <div class="social-links">
+            <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Exchanges - SkillSwap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Reuse existing styles from the dashboard */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem 2rem 2rem 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Sidebar (reused from other pages) */
+        .sidebar {
+            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin: 0.8rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Exchange Content */
+        .exchange-content {
+            flex: 1;
+            max-width: calc(100% - 250px);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--primary);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        /* Active Swaps Section */
+        .active-swaps, .swap-history, .feedback-reminders, .dispute-support {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .swap-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .swap-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .swap-card h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 5px;
+        }
+
+        .swap-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .swap-details p {
+            font-size: 0.9rem;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .swap-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .swap-actions button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .swap-actions button:hover {
+            background: #2980b9;
+        }
+
+        /* Feedback Reminders */
+        .feedback-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-card p {
+            font-size: 0.9rem;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        /* Dispute Support */
+        .dispute-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .dispute-card p {
+            font-size: 0.9rem;
+            color: var(--primary);
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .dispute-card button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .dispute-card button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="nav-icon fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        My Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="search.html" class="nav-link">
+                        <i class="nav-icon fas fa-search"></i>
+                        Search Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="exchange.html" class="nav-link active">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        My Exchanges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link">
+                        <i class="nav-icon fas fa-comments"></i>
+                        Messages
+                        <span class="notification-badge"></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reviews.html" class="nav-link">
+                        <i class="nav-icon fas fa-star"></i>
+                        Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="setting.html" class="nav-link">
+                        <i class="nav-icon fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="login.html" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Exchange Content -->
+        <div class="exchange-content">
+            <h1 class="page-title">My Exchanges</h1>
+            <p class="page-subtitle">Track Your Skill Journey</p>
+
+            <!-- Active Swaps Section -->
+            <div class="active-swaps">
+                <h2 class="section-title">Active Swaps</h2>
+                <div id="activeSwapsList">
+                    <!-- Active swaps will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Swap History Section -->
+            <div class="swap-history">
+                <h2 class="section-title">Swap History</h2>
+                <div id="swapHistoryList">
+                    <!-- Swap history will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Feedback Reminders Section -->
+            <div class="feedback-reminders">
+                <h2 class="section-title">Feedback Reminders</h2>
+                <div class="feedback-card">
+                    <p>Leave a review for your Spanish lessons with Maria.</p>
+                    <button>Leave Feedback</button>
+                </div>
+            </div>
+
+            <!-- Dispute Support Section -->
+            <div class="dispute-support">
+                <h2 class="section-title">Dispute Support</h2>
+                <div class="dispute-card">
+                    <p>Having issues with an exchange? Flag it for our team to mediate.</p>
+                    <button>Flag Issue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve contract data from localStorage
+        const contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+
+        // Display active swaps
+        const activeSwapsList = document.getElementById('activeSwapsList');
+        contracts.forEach(contract => {
+            const swapCard = document.createElement('div');
+            swapCard.classList.add('swap-card');
+            swapCard.innerHTML = `
+                <h3>${contract.skill} with ${contract.partner}</h3>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="swap-details">
+                    <p>0/${contract.sessions} sessions completed</p>
+                    <div class="swap-actions">
+                        <button>View Details</button>
+                        <button>Mark Complete</button>
+                    </div>
+                </div>
+            `;
+            activeSwapsList.appendChild(swapCard);
+        });
+
+        // Display swap history (if any)
+        const swapHistoryList = document.getElementById('swapHistoryList');
+        // Add logic to display completed swaps here
+    </script>
+</body>
+</html>

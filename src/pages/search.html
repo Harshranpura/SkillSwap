@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Skills - SkillSwap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        /* Reuse existing styles from the dashboard */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem 2rem 2rem 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Sidebar (reused from other pages) */
+        .sidebar {
+            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin: 0.8rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Search Content Area */
+        .search-content {
+            flex: 1;
+            max-width: calc(100% - 250px);
+        }
+
+        /* Search Container */
+        .search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: fit-content;
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+
+        .filter-title {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .skill-type-filter {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .type-option {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-option:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .type-option.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .experience-filter, .availability-filter {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .exp-option {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Search Results */
+        .search-results {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .profile-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+            object-fit: cover;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .skill-tag {
+            background: var(--secondary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .connect-button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .connect-button:hover {
+            background: #2980b9;
+        }
+
+        /* Map View Styles */
+        #skillMap {
+            height: 600px;
+            width: 100%;
+            border-radius: 15px;
+            margin-top: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            display: none; /* Hidden by default */
+        }
+
+        .map-marker {
+            background: var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .view-button {
+            background: var(--glass-bg);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-button.active {
+            background: var(--secondary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="nav-icon fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        My Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="search.html" class="nav-link active">
+                        <i class="nav-icon fas fa-search"></i>
+                        Search Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="exchange.html" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        My Exchanges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link">
+                        <i class="nav-icon fas fa-comments"></i>
+                        Messages
+                        <span class="notification-badge">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reviews.html" class="nav-link">
+                        <i class="nav-icon fas fa-star"></i>
+                        Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="setting.html" class="nav-link">
+                        <i class="nav-icon fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="login.html" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Search Content -->
+        <div class="search-content">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="view-button active" data-view="list">List View</button>
+                <button class="view-button" data-view="map">Map View</button>
+            </div>
+
+            <!-- Search Container -->
+            <div class="search-container">
+                <!-- Filters Sidebar -->
+                <aside class="filters-sidebar">
+                    <!-- Skill Type Filter -->
+                    <div class="filter-group">
+                        <h3 class="filter-title">Skill Type</h3>
+                        <div class="skill-type-filter">
+                            <div class="type-option active" data-type="all">
+                                <i class="fas fa-star"></i>
+                                All Skills
+                            </div>
+                            <div class="type-option" data-type="design">
+                                <i class="fas fa-palette"></i>
+                                Design & Creative
+                            </div>
+                            <div class="type-option" data-type="tech">
+                                <i class="fas fa-code"></i>
+                                Technology
+                            </div>
+                            <div class="type-option" data-type="language">
+                                <i class="fas fa-language"></i>
+                                Languages
+                            </div>
+                            <div class="type-option" data-type="business">
+                                <i class="fas fa-briefcase"></i>
+                                Business
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Level Filter -->
+                    <div class="filter-group">
+                        <h3 class="filter-title">Experience Level</h3>
+                        <div class="experience-filter">
+                            <label class="exp-option">
+                                <input type="checkbox" name="experience" value="beginner">
+                                Beginner Friendly
+                            </label>
+                            <label class="exp-option">
+                                <input type="checkbox" name="experience" value="intermediate">
+                                Intermediate
+                            </label>
+                            <label class="exp-option">
+                                <input type="checkbox" name="experience" value="expert">
+                                Expert Level
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Availability Filter -->
+                    <div class="filter-group">
+                        <h3 class="filter-title">Availability</h3>
+                        <div class="availability-filter">
+                            <label class="exp-option">
+                                <input type="checkbox" name="availability" value="remote">
+                                Remote Only
+                            </label>
+                            <label class="exp-option">
+                                <input type="checkbox" name="availability" value="part-time">
+                                Part-Time
+                            </label>
+                            <label class="exp-option">
+                                <input type="checkbox" name="availability" value="full-time">
+                                Full-Time
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="filter-group">
+                        <h3 class="filter-title">Location</h3>
+                        <input type="text" class="search-input" placeholder="City or Remote" 
+                               style="width: 100%; padding: 0.8rem; border-radius: 8px;">
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" 
+                               placeholder="Search skills like 'UI/UX design' or 'Spanish tutoring'...">
+                        <button class="search-button">Search</button>
+                    </div>
+
+                    <!-- Search Results (List View) -->
+                    <div class="search-results">
+                        <!-- Sample Profile Card -->
+                        <div class="profile-card">
+                            <img src="https://via.placeholder.com/100" alt="Alex Designer" class="profile-avatar">
+                            <div class="profile-info">
+                                <h2>Alex Designer</h2>
+                                <div class="skill-tags">
+                                    <span class="skill-tag">UI/UX Design</span>
+                                    <span class="skill-tag">Figma</span>
+                                    <span class="skill-tag">Prototyping</span>
+                                </div>
+                                <p><strong>Experience:</strong> Expert (5+ years)</p>
+                                <p><strong>Availability:</strong> Part-Time</p>
+                                <p><strong>Location:</strong> New York, NY</p>
+                                <button class="connect-button" onclick="connectUser('Alex Designer')">Connect</button>
+                            </div>
+                        </div>
+
+                        <!-- Another Sample Profile Card -->
+                        <div class="profile-card">
+                            <img src="https://via.placeholder.com/100" alt="Maria Tutor" class="profile-avatar">
+                            <div class="profile-info">
+                                <h2>Maria Tutor</h2>
+                                <div class="skill-tags">
+                                    <span class="skill-tag">Spanish</span>
+                                    <span class="skill-tag">DELE Certified</span>
+                                    <span class="skill-tag">Conversational</span>
+                                </div>
+                                <p><strong>Experience:</strong> Native Speaker</p>
+                                <p><strong>Availability:</strong> Full-Time</p>
+                                <p><strong>Location:</strong> Remote</p>
+                                <button class="connect-button" onclick="connectUser('Maria Tutor')">Connect</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skill Map (Map View) -->
+                    <div id="skillMap"></div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize Map
+        let map;
+        function initMap() {
+            map = L.map('skillMap').setView([40.7128, -74.0060], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Sample markers (replace with real data)
+            L.marker([40.7128, -74.0060])
+                .bindPopup(`
+                    <div class="map-marker">
+                        <h3>Sarah Developer</h3>
+                        <p>Skills: Python, Data Science</p>
+                        <p>Available: Part-Time</p>
+                    </div>
+                `).addTo(map);
+
+            L.marker([40.7580, -73.9855])
+                .bindPopup(`
+                    <div class="map-marker">
+                        <h3>Alex Designer</h3>
+                        <p>Skills: UI/UX Design</p>
+                        <p>Available: Remote</p>
+                    </div>
+                `).addTo(map);
+        }
+
+        // View Toggle
+        document.querySelectorAll('.view-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.view-button').forEach(b => b.classList.remove('active'));
+                button.classList.add('active');
+                
+                if(button.dataset.view === 'map') {
+                    document.querySelector('.search-results').style.display = 'none';
+                    document.getElementById('skillMap').style.display = 'block';
+                    if(!map) initMap();
+                } else {
+                    document.querySelector('.search-results').style.display = 'grid';
+                    document.getElementById('skillMap').style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize list view by default
+        document.querySelector('.search-results').style.display = 'grid';
+
+        // Redirect to Messages Page with selected user
+        function connectUser(userName) {
+            // Store the selected user in localStorage (or sessionStorage)
+            localStorage.setItem('selectedUser', userName);
+            // Redirect to the Messages page
+            window.location.href = 'messages.html';
+        }
+    </script>
+</body>
+</html>

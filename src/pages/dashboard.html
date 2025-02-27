@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>SkillSwap Dashboard</title>
+    <style>
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin: 0.8rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem 2rem 2rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            max-width: calc(100% - 250px);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Swap Tracker Styles */
+        .swap-tracker {
+            grid-column: 1 / -1;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .kanban-column {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            min-height: 300px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        /* Skill Hours System */
+        .skill-hours {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .hour-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .hour-controls button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .hour-controls button:hover {
+            background: rgba(41, 128, 185, 0.9);
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status-message.visible {
+            display: block;
+        }
+
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        /* Skill Network Map Styles */
+        #skillMap {
+            height: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .node {
+            fill: #2ecc71;
+            stroke: #fff;
+            stroke-width: 2px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .node.self {
+            fill: #e74c3c;
+        }
+
+        .link {
+            stroke: rgba(52, 152, 219, 0.4);
+            stroke-width: 2;
+        }
+
+        .node-label {
+            font-size: 12px;
+            fill: #2c3e50;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+            
+            .glass-card {
+                grid-column: 1 / -1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link active">
+                        <i class="nav-icon fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile.html" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        My Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/search.html" class="nav-link">
+                        <i class="nav-icon fas fa-search"></i>
+                        Search Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/exchange.html" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        My Exchanges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/messages.html" class="nav-link">
+                        <i class="nav-icon fas fa-comments"></i>
+                        Messages
+                        <span class="notification-badge"></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/reviews.html" class="nav-link">
+                        <i class="nav-icon fas fa-star"></i>
+                        Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/setting.html" class="nav-link">
+                        <i class="nav-icon fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="/login.html" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="dashboard-grid">
+            <!-- Skill Network Map -->
+            <div class="glass-card" style="grid-column: span 2">
+                <h2>Skill Network Map</h2>
+                <div id="skillMap"></div>
+            </div>
+
+            <!-- Swap Tracker -->
+            <div class="glass-card swap-tracker">
+                <h2>Swap Tracker</h2>
+                <div class="kanban-board">
+                    <div class="kanban-column" id="todo">
+                        <h3>To-Do</h3>
+                        <div class="task-card" draggable="true">Teach Graphic Design</div>
+                        <div class="task-card" draggable="true">Learn Python Basics</div>
+                    </div>
+                    <div class="kanban-column" id="in-progress">
+                        <h3>In Progress</h3>
+                        <div class="task-card" draggable="true">Web Design Swap</div>
+                    </div>
+                    <div class="kanban-column" id="completed">
+                        <h3>Completed</h3>
+                    </div>
+                </div>
+                <div class="skill-hours">
+                    <strong>Skill Hours: <span id="skillHours">15</span>h</strong>
+                    <div class="hour-controls">
+                        <button data-action="add" data-value="1">+1</button>
+                        <button data-action="add" data-value="5">+5</button>
+                        <button data-action="subtract" data-value="1">-1</button>
+                        <button data-action="subtract" data-value="5">-5</button>
+                    </div>
+                    <div id="hourStatus" class="status-message"></div>
+                </div>
+            </div>
+
+            <!-- Trust and Skill Balance Cards -->
+            <div class="glass-card">
+                <div class="trust-score">
+                    <h2>Skill Balance</h2>
+                    <div class="score-display">1.5:1</div>
+                    <p>Offered: 12h | Requested: 8h</p>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="trust-score">
+                    <h2>Trust Score</h2>
+                    <div class="score-display">88</div>
+                    <p>Completion Rate: 99%</p>
+                </div>
+            </div>
+
+            <!-- Feedback and Portfolio Sections -->
+            <div class="glass-card">
+                <h2>Feedback Exchange</h2>
+                <textarea placeholder="Enter your feedback..." rows="4" id="feedbackInput"></textarea>
+                <button id="submitFeedback">Submit Feedback</button>
+            </div>
+
+            <div class="glass-card">
+                <h2>Skill Portfolio</h2>
+                <button id="addCertification">Add Certification</button>
+            </div>
+
+            <!-- Collaboration Wall -->
+            <div class="glass-card" style="grid-column: 1 / -1;">
+                <h2>Collaboration Wall</h2>
+                <div id="collaborationFeed">
+                    <p>🎉 Alex learned Python from Maria!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://d3js.org/d3.v7.min.js" onerror="this.onerror=null; this.src='/js/d3.v7.min.js'"></script>
+
+        <!-- Application Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    const response = await fetch('/api/profile', { credentials: 'include' });
+                    if (!response.ok) throw new Error('Unauthorized or server error');
+                    const userData = await response.json();
+
+                    // Update dashboard content with user data
+                    document.getElementById('skillHours').textContent = userData.skills.reduce((total, skill) => total + (parseFloat(skill.availability.split(' ')[0]) || 0), 0) || 0;
+
+                    // Drag-and-Drop Implementation
+                    let draggedItem = null;
+
+                    document.addEventListener('dragstart', e => {
+                        if (e.target.classList.contains('task-card')) {
+                            draggedItem = e.target;
+                            setTimeout(() => e.target.style.opacity = '0.5', 0);
+                        }
+                    });
+
+                    document.addEventListener('dragend', e => {
+                        if (e.target.classList.contains('task-card')) {
+                            e.target.style.opacity = '1';
+                            draggedItem = null;
+                        }
+                    });
+
+                    document.addEventListener('dragover', e => {
+                        e.preventDefault();
+                        const column = e.target.closest('.kanban-column');
+                        if (column && draggedItem) {
+                            const afterElement = getDragAfterElement(column, e.clientY);
+                            if (afterElement) {
+                                column.insertBefore(draggedItem, afterElement);
+                            } else {
+                                column.appendChild(draggedItem);
+                            }
+                        }
+                    });
+
+                    // Skill Hours System
+                    document.querySelectorAll('.hour-controls button').forEach(button => {
+                        button.addEventListener('click', async () => {
+                            const action = button.dataset.action;
+                            const value = parseInt(button.dataset.value);
+                            
+                            try {
+                                const response = await fetch('/api/skill-hours', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action, value }),
+                                    credentials: 'include'
+                                });
+
+                                const data = await response.json();
+                                
+                                if (response.ok) {
+                                    document.getElementById('skillHours').textContent = data.hours;
+                                    showStatus(`Success! New balance: ${data.hours}h`, 'success');
+                                } else {
+                                    throw new Error(data.error || 'Transaction failed');
+                                }
+                            } catch (error) {
+                                showStatus(error.message, 'error');
+                            }
+                        });
+                    });
+
+                    // Feedback Submission
+                    document.getElementById('submitFeedback').addEventListener('click', async () => {
+                        const feedback = document.getElementById('feedbackInput').value;
+                        try {
+                            const response = await fetch('/api/submit-feedback', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ feedback }),
+                                credentials: 'include'
+                            });
+
+                            if (response.ok) {
+                                alert('Feedback submitted successfully!');
+                                document.getElementById('feedbackInput').value = '';
+                            } else {
+                                const data = await response.json();
+                                alert(`Failed to submit feedback: ${data.error}`);
+                            }
+                        } catch (error) {
+                            console.error('Feedback submission error:', error);
+                            alert('Failed to submit feedback. Please try again.');
+                        }
+                    });
+
+                    // Initialize Skill Map
+                    initSkillMap(userData.skills);
+                } catch (error) {
+                    console.error('Dashboard initialization error:', error);
+                    if (error.message === 'Unauthorized or server error') {
+                        alert('Please log in to access the dashboard.');
+                        window.location.href = '/login.html';
+                    } else {
+                        alert('Failed to load dashboard. Please try again.');
+                    }
+                }
+            });
+
+            // Skill Map Implementation
+            function initSkillMap(skills) {
+                const container = document.getElementById('skillMap');
+                const width = container.clientWidth;
+                const height = 400;
+
+                const svg = d3.select("#skillMap")
+                    .html('')
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                // Sample Data (Replace with real skills data)
+                const nodes = [
+                    { id: "You", type: "self", x: width/2, y: height/2 },
+                    ...skills.map((skill, i) => ({
+                        id: skill.skill_name,
+                        type: "connection",
+                        x: width/2 + (i * 50 - 100),
+                        y: height/2 + (i * 50 - 100)
+                    }))
+                ].slice(0, 5); // Limit to 5 nodes for simplicity
+
+                const links = nodes.slice(1).map(node => ({ source: "You", target: node.id }));
+
+                // Force Simulation
+                const simulation = d3.forceSimulation(nodes)
+                    .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+                    .force("charge", d3.forceManyBody().strength(-30))
+                    .force("center", d3.forceCenter(width/2, height/2));
+
+                // Draw Elements
+                const link = svg.append("g")
+                    .selectAll("line")
+                    .data(links)
+                    .enter().append("line")
+                    .attr("class", "link")
+                    .attr("stroke-width", 2);
+
+                const node = svg.append("g")
+                    .selectAll("circle")
+                    .data(nodes)
+                    .enter().append("circle")
+                    .attr("class", d => `node ${d.type}`)
+                    .attr("r", 20)
+                    .call(drag(simulation));
+
+                const labels = svg.append("g")
+                    .selectAll("text")
+                    .data(nodes)
+                    .enter().append("text")
+                    .attr("class", "node-label")
+                    .text(d => d.id)
+                    .attr("dx", 25)
+                    .attr("dy", 5);
+
+                // Simulation Update
+                simulation.on("tick", () => {
+                    link.attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    node.attr("cx", d => d.x)
+                        .attr("cy", d => d.y);
+
+                    labels.attr("x", d => d.x)
+                        .attr("y", d => d.y);
+                });
+
+                // Drag Behavior
+                function drag(simulation) {
+                    return d3.drag()
+                        .on("start", (event, d) => {
+                            if (!event.active) simulation.alphaTarget(0.3).restart();
+                            d.fx = d.x;
+                            d.fy = d.y;
+                        })
+                        .on("drag", (event, d) => {
+                            d.fx = event.x;
+                            d.fy = event.y;
+                        })
+                        .on("end", (event, d) => {
+                            if (!event.active) simulation.alphaTarget(0);
+                            d.fx = null;
+                            d.fy = null;
+                        });
+                }
+            }
+
+            // Helper Functions
+            function getDragAfterElement(column, y) {
+                const cards = column.querySelectorAll('.task-card:not(.dragging)');
+                return Array.from(cards).reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    return offset < 0 && offset > closest.offset ? 
+                        { offset, element: child } : closest;
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            function showStatus(message, type) {
+                const statusDiv = document.getElementById('hourStatus');
+                statusDiv.textContent = message;
+                statusDiv.className = `status-message visible ${type}`;
+                
+                setTimeout(() => {
+                    statusDiv.className = 'status-message';
+                }, 3000);
+            }
+        </script>
+        <!-- FullCalendar CDN Scripts with local fallback (if needed for this page) -->
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/core/main.js'"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/daygrid/main.js'"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/timegrid/main.js'"></script>
+    </body>
+</html>

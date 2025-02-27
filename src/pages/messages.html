@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - SkillSwap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Reuse existing styles from the dashboard */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem 2rem 2rem 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Sidebar (reused from other pages) */
+        .sidebar {
+            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin: 0.8rem 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Messages Content */
+        .messages-content {
+            flex: 1;
+            max-width: calc(100% - 250px);
+            display: flex;
+            gap: 2rem;
+        }
+
+        /* Chat List */
+        .chat-list {
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-list-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .chat-list-item.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .chat-list-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+            object-fit: cover;
+        }
+
+        .chat-list-item h3 {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .chat-list-item p {
+            font-size: 0.8rem;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: calc(100vh - 4rem);
+        }
+
+        .chat-header {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 0.8rem;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+
+        .message.sent {
+            background: var(--secondary);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message.received {
+            background: rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Generate Contract Button */
+        .generate-contract-button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Contract Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal h2 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .modal label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .modal input, .modal textarea, .modal select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .modal button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2>SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <i class="nav-icon fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        My Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="search.html" class="nav-link">
+                        <i class="nav-icon fas fa-search"></i>
+                        Search Skills
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="exchange.html" class="nav-link">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        My Exchanges
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link active">
+                        <i class="nav-icon fas fa-comments"></i>
+                        Messages
+                        <span class="notification-badge"></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="reviews.html" class="nav-link">
+                        <i class="nav-icon fas fa-star"></i>
+                        Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="setting.html" class="nav-link">
+                        <i class="nav-icon fas fa-cog"></i>
+                        Settings
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="login.html" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Messages Content -->
+        <div class="messages-content">
+            <!-- Chat List -->
+            <div class="chat-list" id="chat-list">
+                <!-- Chat list items will be dynamically added here -->
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    Chat with <span id="selectedUser"></span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Type your message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+                <button class="generate-contract-button" onclick="openContractModal()">Generate Contract</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Modal -->
+    <div id="contractModal" class="modal">
+        <div class="modal-content">
+            <h2>Generate Contract</h2>
+            <form id="contractForm">
+                <label for="skill">Skill to Exchange:</label>
+                <input type="text" id="skill" name="skill" required>
+                <label for="sessions">Number of Sessions:</label>
+                <input type="number" id="sessions" name="sessions" required>
+                <label for="duration">Duration per Session (hours):</label>
+                <input type="number" id="duration" name="duration" required>
+                <label for="mode">Mode of Communication:</label>
+                <select id="mode" name="mode">
+                    <option value="online">Online</option>
+                    <option value="in-person">In-Person</option>
+                </select>
+                <label for="terms">Additional Terms:</label>
+                <textarea id="terms" name="terms" rows="4"></textarea>
+                <button type="submit">Generate Contract</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fetch chat list on page load
+        async function fetchChatList() {
+            const response = await fetch('/api/chat_list');
+            if (response.ok) {
+                const chatList = await response.json();
+                const chatListElement = document.getElementById('chat-list');
+                chatListElement.innerHTML = '';
+                chatList.forEach(chat => {
+                    const chatListItem = document.createElement('div');
+                    chatListItem.className = 'chat-list-item';
+                    chatListItem.setAttribute('data-user-id', chat.user_id);
+                    chatListItem.setAttribute('data-user-name', chat.user_name);
+                    chatListItem.innerHTML = `
+                        <img src="${chat.profile_picture}" alt="${chat.user_name}">
+                        <div>
+                            <h3>${chat.user_name}</h3>
+                            <p>${chat.last_message}</p>
+                        </div>
+                    `;
+                    chatListItem.addEventListener('click', () => openChat(chat.user_id, chat.user_name));
+                    chatListElement.appendChild(chatListItem);
+                });
+            } else {
+                console.error('Failed to fetch chat list.');
+            }
+        }
+
+        // Open Chat
+        function openChat(userId, userName) {
+            // Set the selected user
+            document.getElementById('selectedUser').textContent = userName;
+
+            // Clear the chat messages
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+
+            // Load the chat messages
+            fetchMessages(userId);
+
+            // Store the receiver ID
+            chatMessages.setAttribute('data-receiver-id', userId);
+        }
+
+        // Fetch messages for a specific chat
+        async function fetchMessages(receiverId) {
+            const response = await fetch(`/api/messages?receiver_id=${receiverId}`);
+            if (response.ok) {
+                const messages = await response.json();
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = '';
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message', msg.sender === 'You' ? 'sent' : 'received');
+                    messageDiv.innerHTML = `
+                        <p>${msg.message}</p>
+                        <small>${msg.timestamp}</small>
+                    `;
+                    chatMessages.appendChild(messageDiv);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                console.error('Failed to fetch messages.');
+            }
+        }
+
+        // Send Message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                const receiverId = document.getElementById('chatMessages').getAttribute('data-receiver-id');
+                const response = await fetch('/api/send_message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ receiver_id: receiverId, message })
+                });
+
+                if (response.ok) {
+                    const user = document.getElementById('selectedUser').textContent;
+                    const chatMessages = document.getElementById('chatMessages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message', 'sent');
+                    messageDiv.innerHTML = `
+                        <p>${message}</p>
+                        <small>${new Date().toLocaleTimeString()}</small>
+                    `;
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    input.value = ''; // Clear the input
+                } else {
+                    alert('Failed to send message.');
+                }
+            }
+        }
+
+        // Contract Modal
+        function openContractModal() {
+            document.getElementById('contractModal').style.display = 'flex';
+        }
+
+        function closeContractModal() {
+            document.getElementById('contractModal').style.display = 'none';
+        }
+
+        // Handle Contract Form Submission
+        document.getElementById('contractForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const skill = document.getElementById('skill').value;
+            const sessions = document.getElementById('sessions').value;
+            const duration = document.getElementById('duration').value;
+            const mode = document.getElementById('mode').value;
+            const terms = document.getElementById('terms').value;
+
+            const response = await fetch('/api/generate_contract', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skill, sessions, duration, mode, terms })
+            });
+
+            if (response.ok) {
+                alert('Contract Generated Successfully!');
+                closeContractModal();
+            } else {
+                alert('Failed to generate contract.');
+            }
+        });
+
+        // Fetch chat list initially
+        fetchChatList();
+    </script>
+</body>
+</html>
