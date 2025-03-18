@@ -6,7 +6,6 @@
     <title>Messages - SkillSwap</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Reuse existing styles from the dashboard */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -25,7 +24,6 @@
             position: relative;
         }
 
-        /* Sidebar (reused from other pages) */
         .sidebar {
             width: 250px;
             background: var(--glass-bg);
@@ -63,7 +61,6 @@
             color: white;
         }
 
-        /* Messages Content */
         .messages-content {
             flex: 1;
             max-width: calc(100% - 250px);
@@ -71,7 +68,6 @@
             gap: 2rem;
         }
 
-        /* Chat List */
         .chat-list {
             width: 300px;
             background: var(--glass-bg);
@@ -122,7 +118,6 @@
             opacity: 0.8;
         }
 
-        /* Chat Interface */
         .chat-container {
             flex: 1;
             display: flex;
@@ -147,12 +142,14 @@
             flex-direction: column;
             gap: 0.5rem;
             overflow-y: auto;
+            padding: 1rem;
         }
 
         .message {
             padding: 0.8rem;
             border-radius: 10px;
             max-width: 70%;
+            margin: 0.5rem 0;
         }
 
         .message.sent {
@@ -188,7 +185,6 @@
             cursor: pointer;
         }
 
-        /* Generate Contract Button */
         .generate-contract-button {
             background: var(--secondary);
             color: white;
@@ -199,7 +195,6 @@
             margin-top: 1rem;
         }
 
-        /* Contract Modal */
         .modal {
             display: none;
             position: fixed;
@@ -251,7 +246,6 @@
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <h2>SkillSwap</h2>
             <ul class="sidebar-nav">
@@ -307,19 +301,16 @@
             </ul>
         </nav>
 
-        <!-- Messages Content -->
         <div class="messages-content">
-            <!-- Chat List -->
             <div class="chat-list" id="chat-list">
                 <!-- Chat list items will be dynamically added here -->
             </div>
 
-            <!-- Chat Interface -->
             <div class="chat-container">
                 <div class="chat-header">
                     Chat with <span id="selectedUser"></span>
                 </div>
-                <div class="chat-messages" id="chatMessages">
+                <div class="chat-messages" id="chatMessages" data-receiver-id="">
                     <!-- Messages will be dynamically added here -->
                 </div>
                 <div class="chat-input">
@@ -331,7 +322,6 @@
         </div>
     </div>
 
-    <!-- Contract Modal -->
     <div id="contractModal" class="modal">
         <div class="modal-content">
             <h2>Generate Contract</h2>
@@ -355,68 +345,112 @@
     </div>
 
     <script>
-        // Fetch chat list on page load
-        async function fetchChatList() {
-            const response = await fetch('/api/chat_list');
-            if (response.ok) {
-                const chatList = await response.json();
-                const chatListElement = document.getElementById('chat-list');
-                chatListElement.innerHTML = '';
-                chatList.forEach(chat => {
-                    const chatListItem = document.createElement('div');
-                    chatListItem.className = 'chat-list-item';
-                    chatListItem.setAttribute('data-user-id', chat.user_id);
-                    chatListItem.setAttribute('data-user-name', chat.user_name);
-                    chatListItem.innerHTML = `
-                        <img src="${chat.profile_picture}" alt="${chat.user_name}">
-                        <div>
-                            <h3>${chat.user_name}</h3>
-                            <p>${chat.last_message}</p>
-                        </div>
-                    `;
-                    chatListItem.addEventListener('click', () => openChat(chat.user_id, chat.user_name));
-                    chatListElement.appendChild(chatListItem);
-                });
+        // Initialize chat with selected user on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Extract receiver_id from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            let receiverId = urlParams.get('receiver_id');
+            let receiverName = urlParams.get('receiver_name');
+
+            // Fall back to localStorage if no URL parameter
+            if (!receiverId || !receiverName) {
+                receiverId = localStorage.getItem('selectedUserId');
+                receiverName = localStorage.getItem('selectedUserName');
+            }
+
+            if (receiverId && receiverName) {
+                document.getElementById('selectedUser').textContent = receiverName;
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.setAttribute('data-receiver-id', receiverId);
+                fetchMessages(receiverId);
+                // Clear localStorage after use to avoid persistence issues
+                localStorage.removeItem('selectedUserId');
+                localStorage.removeItem('selectedUserName');
             } else {
-                console.error('Failed to fetch chat list.');
+                document.getElementById('selectedUser').textContent = 'No User Selected';
+                alert('No receiver selected. Please select a user to chat with from the chat list or search page.');
+            }
+            fetchChatList();
+        });
+
+        // Fetch chat list
+        async function fetchChatList() {
+            try {
+                const response = await fetch('/api/chat_list', {
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const chatList = await response.json();
+                    const chatListElement = document.getElementById('chat-list');
+                    chatListElement.innerHTML = '';
+                    chatList.forEach(chat => {
+                        const chatListItem = document.createElement('div');
+                        chatListItem.className = 'chat-list-item';
+                        chatListItem.setAttribute('data-user-id', chat.user_id);
+                        chatListItem.setAttribute('data-user-name', chat.user_name);
+                        chatListItem.innerHTML = `
+                            <img src="${chat.profile_picture || 'https://via.placeholder.com/50'}" alt="${chat.user_name}">
+                            <div>
+                                <h3>${chat.user_name}</h3>
+                                <p>${chat.last_message || 'No messages yet'}</p>
+                            </div>
+                        `;
+                        chatListItem.addEventListener('click', () => openChat(chat.user_id, chat.user_name));
+                        chatListElement.appendChild(chatListItem);
+                    });
+                } else {
+                    console.error('Failed to fetch chat list:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error fetching chat list:', error);
             }
         }
 
         // Open Chat
         function openChat(userId, userName) {
-            // Set the selected user
             document.getElementById('selectedUser').textContent = userName;
-
-            // Clear the chat messages
             const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
-
-            // Load the chat messages
+            chatMessages.setAttribute('data-receiver-id', userId);
             fetchMessages(userId);
 
-            // Store the receiver ID
-            chatMessages.setAttribute('data-receiver-id', userId);
+            // Highlight the selected chat in the list
+            document.querySelectorAll('.chat-list-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-user-id') === userId) {
+                    item.classList.add('active');
+                }
+            });
         }
 
         // Fetch messages for a specific chat
         async function fetchMessages(receiverId) {
-            const response = await fetch(`/api/messages?receiver_id=${receiverId}`);
-            if (response.ok) {
-                const messages = await response.json();
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '';
-                messages.forEach(msg => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.classList.add('message', msg.sender === 'You' ? 'sent' : 'received');
-                    messageDiv.innerHTML = `
-                        <p>${msg.message}</p>
-                        <small>${msg.timestamp}</small>
-                    `;
-                    chatMessages.appendChild(messageDiv);
+            if (!receiverId) {
+                console.error('No receiver ID provided for fetching messages.');
+                return;
+            }
+            try {
+                const response = await fetch(`/api/messages?receiver_id=${receiverId}`, {
+                    credentials: 'include'
                 });
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            } else {
-                console.error('Failed to fetch messages.');
+                if (response.ok) {
+                    const messages = await response.json();
+                    const chatMessages = document.getElementById('chatMessages');
+                    chatMessages.innerHTML = '';
+                    messages.forEach(msg => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('message', msg.sender_id === sessionStorage.getItem('userId') ? 'sent' : 'received');
+                        messageDiv.innerHTML = `
+                            <p>${msg.message}</p>
+                            <small>${new Date(msg.timestamp).toLocaleString()}</small>
+                        `;
+                        chatMessages.appendChild(messageDiv);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    console.error('Failed to fetch messages:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
             }
         }
 
@@ -424,29 +458,45 @@
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
-            if (message) {
-                const receiverId = document.getElementById('chatMessages').getAttribute('data-receiver-id');
+            if (!message) return;
+
+            const receiverId = document.getElementById('chatMessages').getAttribute('data-receiver-id');
+            if (!receiverId) {
+                alert('No receiver selected. Please select a user to chat with from the chat list or search page.');
+                return;
+            }
+
+            try {
                 const response = await fetch('/api/send_message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ receiver_id: receiverId, message })
+                    body: JSON.stringify({
+                        receiver_id: receiverId,
+                        message: message
+                    }),
+                    credentials: 'include'
                 });
 
                 if (response.ok) {
-                    const user = document.getElementById('selectedUser').textContent;
+                    const userName = document.getElementById('selectedUser').textContent;
                     const chatMessages = document.getElementById('chatMessages');
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('message', 'sent');
                     messageDiv.innerHTML = `
                         <p>${message}</p>
-                        <small>${new Date().toLocaleTimeString()}</small>
+                        <small>${new Date().toLocaleString()}</small>
                     `;
                     chatMessages.appendChild(messageDiv);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                     input.value = ''; // Clear the input
+                    fetchChatList(); // Update the chat list with the new message
                 } else {
-                    alert('Failed to send message.');
+                    const errorText = await response.text();
+                    alert(`Failed to send message: ${errorText}`);
                 }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
             }
         }
 
@@ -467,23 +517,40 @@
             const duration = document.getElementById('duration').value;
             const mode = document.getElementById('mode').value;
             const terms = document.getElementById('terms').value;
+            const receiverId = document.getElementById('chatMessages').getAttribute('data-receiver-id');
 
-            const response = await fetch('/api/generate_contract', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ skill, sessions, duration, mode, terms })
-            });
+            if (!receiverId) {
+                alert('No receiver selected. Please select a user to generate a contract with.');
+                return;
+            }
 
-            if (response.ok) {
-                alert('Contract Generated Successfully!');
-                closeContractModal();
-            } else {
-                alert('Failed to generate contract.');
+            try {
+                const response = await fetch('/api/generate_contract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        receiver_id: receiverId,
+                        skill, 
+                        sessions, 
+                        duration, 
+                        mode, 
+                        terms 
+                    }),
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    alert('Contract Generated Successfully!');
+                    closeContractModal();
+                } else {
+                    const errorText = await response.text();
+                    alert(`Failed to generate contract: ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Error generating contract:', error);
+                alert('Failed to generate contract. Please try again.');
             }
         });
-
-        // Fetch chat list initially
-        fetchChatList();
     </script>
 </body>
 </html>

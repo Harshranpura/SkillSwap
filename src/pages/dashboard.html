@@ -217,6 +217,27 @@
             pointer-events: none;
         }
 
+        .skill-type-tag {
+            background: #3498db;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            visibility: hidden;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .dashboard-grid {
@@ -316,7 +337,8 @@
                     </div>
                 </div>
                 <div class="skill-hours">
-                    <strong>Skill Hours: <span id="skillHours">15</span>h</strong>
+                    <strong>Skill Hours: <span id="skillHours">0</span>h</strong>
+                    <p>Location: <span id="userLocation">Remote</span></p>
                     <div class="hour-controls">
                         <button data-action="add" data-value="1">+1</button>
                         <button data-action="add" data-value="5">+5</button>
@@ -353,6 +375,7 @@
 
             <div class="glass-card">
                 <h2>Skill Portfolio</h2>
+                <ul id="skills-list"></ul>
                 <button id="addCertification">Add Certification</button>
             </div>
 
@@ -365,6 +388,9 @@
             </div>
         </div>
 
+        <!-- Tooltip Container -->
+        <div id="tooltip"></div>
+
         <!-- JavaScript Libraries -->
         <script src="https://d3js.org/d3.v7.min.js" onerror="this.onerror=null; this.src='/js/d3.v7.min.js'"></script>
 
@@ -373,11 +399,19 @@
             document.addEventListener('DOMContentLoaded', async () => {
                 try {
                     const response = await fetch('/api/profile', { credentials: 'include' });
-                    if (!response.ok) throw new Error('Unauthorized or server error');
+                    if (!response.ok) {
+                        throw new Error(response.status === 401 ? 'Unauthorized' : 'Server error');
+                    }
                     const userData = await response.json();
 
                     // Update dashboard content with user data
-                    document.getElementById('skillHours').textContent = userData.skills.reduce((total, skill) => total + (parseFloat(skill.availability.split(' ')[0]) || 0), 0) || 0;
+                    document.getElementById('skillHours').textContent = userData.skill_hours || 0;
+                    document.getElementById('userLocation').textContent = userData.location || 'Remote';
+                    document.getElementById('skills-list').innerHTML = (userData.skills && userData.skills.length > 0) 
+                        ? userData.skills.map(skill => `
+                            <li>${skill.skill_name} <span class="skill-type-tag">${skill.skill_type}</span> (${skill.experience_level})</li>
+                        `).join('') 
+                        : '<li>No skills added yet.</li>';
 
                     // Drag-and-Drop Implementation
                     let draggedItem = null;
@@ -424,14 +458,16 @@
                                 });
 
                                 const data = await response.json();
+                                console.log('Skill hours response:', data); // Debug log
                                 
                                 if (response.ok) {
-                                    document.getElementById('skillHours').textContent = data.hours;
-                                    showStatus(`Success! New balance: ${data.hours}h`, 'success');
+                                    document.getElementById('skillHours').textContent = data.hours || 0;
+                                    showStatus(`Success! New balance: ${data.hours || 0}h`, 'success');
                                 } else {
                                     throw new Error(data.error || 'Transaction failed');
                                 }
                             } catch (error) {
+                                console.error('Skill hours error:', error);
                                 showStatus(error.message, 'error');
                             }
                         });
@@ -439,7 +475,11 @@
 
                     // Feedback Submission
                     document.getElementById('submitFeedback').addEventListener('click', async () => {
-                        const feedback = document.getElementById('feedbackInput').value;
+                        const feedback = document.getElementById('feedbackInput').value.trim();
+                        if (!feedback) {
+                            alert('Feedback cannot be empty.');
+                            return;
+                        }
                         try {
                             const response = await fetch('/api/submit-feedback', {
                                 method: 'POST',
@@ -462,14 +502,14 @@
                     });
 
                     // Initialize Skill Map
-                    initSkillMap(userData.skills);
+                    initSkillMap(userData.skills || []);
                 } catch (error) {
                     console.error('Dashboard initialization error:', error);
-                    if (error.message === 'Unauthorized or server error') {
+                    if (error.message === 'Unauthorized') {
                         alert('Please log in to access the dashboard.');
                         window.location.href = '/login.html';
                     } else {
-                        alert('Failed to load dashboard. Please try again.');
+                        alert('Failed to load dashboard. Please check the console for details.');
                     }
                 }
             });
@@ -486,14 +526,15 @@
                     .attr("width", width)
                     .attr("height", height);
 
-                // Sample Data (Replace with real skills data)
+                // Data based on user skills
                 const nodes = [
                     { id: "You", type: "self", x: width/2, y: height/2 },
                     ...skills.map((skill, i) => ({
-                        id: skill.skill_name,
+                        id: `${skill.skill_name} (${skill.skill_type || 'N/A'})`,
                         type: "connection",
                         x: width/2 + (i * 50 - 100),
-                        y: height/2 + (i * 50 - 100)
+                        y: height/2 + (i * 50 - 100),
+                        details: skill || {}
                     }))
                 ].slice(0, 5); // Limit to 5 nodes for simplicity
 
@@ -519,6 +560,25 @@
                     .enter().append("circle")
                     .attr("class", d => `node ${d.type}`)
                     .attr("r", 20)
+                    .on("mouseover", (event, d) => {
+                        if (d.details) {
+                            const tooltip = document.getElementById('tooltip');
+                            tooltip.style.visibility = 'visible';
+                            tooltip.innerHTML = `
+                                <strong>${d.id}</strong><br>
+                                Experience: ${d.details.experience_level || 'N/A'}<br>
+                                Type: ${d.details.skill_type || 'N/A'}<br>
+                                Specialties: ${d.details.specialties || 'N/A'}<br>
+                                Availability: ${d.details.availability || 'N/A'}<br>
+                                Certifications: ${d.details.certifications || 'N/A'}
+                            `;
+                            tooltip.style.left = (event.pageX + 10) + "px";
+                            tooltip.style.top = (event.pageY - 28) + "px";
+                        }
+                    })
+                    .on("mouseout", () => {
+                        document.getElementById('tooltip').style.visibility = 'hidden';
+                    })
                     .call(drag(simulation));
 
                 const labels = svg.append("g")

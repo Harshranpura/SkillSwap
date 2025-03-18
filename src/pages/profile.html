@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - SkillSwap</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.css" rel="stylesheet" onerror="this.onerror=null; this.href='/css/fullcalendar/core/main.css'">
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.css" rel="stylesheet" onerror="this.onerror=null; this.href='/css/fullcalendar/daygrid/main.css'">
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid/main.css" rel="stylesheet" onerror="this.onerror=null; this.href='/css/fullcalendar/timegrid/main.css'">
     <style>
         :root {
             --primary: #2c3e50;
@@ -29,14 +26,13 @@
         .nav-icon { width: 25px; text-align: center; }
         .profile-container { flex: 1; max-width: 1200px; margin: 0 auto; display: grid; gap: 2rem; }
         .profile-header { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; }
-        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--secondary); object-fit: cover; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--secondary); object-fit: cover; cursor: pointer; }
         .profile-bio { font-size: 1.1rem; color: var(--primary); }
-        .profile-actions { display: flex; gap: 1rem; margin-top: 1rem; }
-        .profile-actions button { background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 25px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
-        .profile-actions button:hover { background: var(--primary); }
         .file-input { display: none; }
-        .file-input-label { background: var(--secondary); color: white; padding: 0.5rem 1rem; border-radius: 25px; cursor: pointer; display: inline-block; margin-top: 1rem; }
-        .file-input-label:hover { background: var(--primary); }
+        .custom-icon { width: 24px; height: 24px; cursor: pointer; margin-top: 1rem; margin-right: 1rem; vertical-align: middle; transition: opacity 0.3s ease; }
+        .custom-icon:hover { opacity: 0.7; }
+        .edit-icon { width: 16px; height: 16px; cursor: pointer; margin-left: 0.5rem; vertical-align: middle; transition: opacity 0.3s ease; }
+        .edit-icon:hover { opacity: 0.7; }
         .resume-link { color: var(--secondary); text-decoration: none; margin-top: 1rem; display: inline-block; }
         .resume-link:hover { text-decoration: underline; }
         .skills-section { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; }
@@ -48,8 +44,48 @@
         .skill-actions button:hover { color: var(--secondary); }
         .add-skill-btn { background: var(--secondary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
         .add-skill-btn:hover { background: var(--primary); }
-        .calendar-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
-        #calendar { height: 400px; margin-top: 1rem; }
+        .availability-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
+        #availability-list {
+            list-style: none;
+            padding: 0;
+        }
+        .availability-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .availability-item button {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .availability-item button:hover {
+            background: darken(var(--danger), 10%);
+        }
+        .add-availability-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .add-availability-btn:hover {
+            background: darken(var(--success), 10%);
+        }
         .badges-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
         .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.2rem; margin: 0.5rem; border-radius: 25px; background: rgba(255,255,255,0.2); }
         .badge.gold { background: #ffd700; color: #000; }
@@ -71,7 +107,7 @@
             .sidebar { width: 100%; height: auto; position: relative; }
             .profile-header { grid-template-columns: 1fr; text-align: center; }
             .profile-avatar { margin: 0 auto; }
-            .profile-actions { flex-direction: column; }
+            .custom-icon { display: block; margin: 0.5rem 0; }
         }
     </style>
 </head>
@@ -94,19 +130,19 @@
         <div class="profile-container">
             <section class="profile-header">
                 <div>
-                    <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-avatar" id="profile-avatar">
-                    <label for="profile-photo" class="file-input-label"><i class="fas fa-camera"></i> Upload Photo</label>
+                    <img src="/images/default-avatar.png" alt="Profile Picture" class="profile-avatar" id="profile-avatar" 
+                         onerror="this.src='https://via.placeholder.com/120'; console.error('Default avatar failed to load, falling back to placeholder');" 
+                         onclick="previewProfilePhoto(this.src)">
+                    <img src="/uploads/camera.png" alt="Camera Icon" class="custom-icon" onclick="document.getElementById('profile-photo').click()" title="Upload Photo">
+                    <img src="/uploads/upload.png" alt="Resume Icon" class="custom-icon" onclick="document.getElementById('resume').click()" title="Upload Resume">
                     <input type="file" id="profile-photo" class="file-input" accept="image/*">
+                    <input type="file" id="resume" class="file-input" accept=".pdf,.doc,.docx">
                 </div>
                 <div>
-                    <h1 id="profile-name">Narayan</h1>
-                    <p class="profile-bio" id="profile-bio">Data Engineer</p>
-                    <div class="profile-actions">
-                        <button onclick="editName()"><i class="fas fa-edit"></i> Edit Name</button>
-                        <button onclick="editBio()"><i class="fas fa-edit"></i> Edit Bio</button>
-                    </div>
-                    <label for="resume" class="file-input-label"><i class="fas fa-file-upload"></i> Upload Resume</label>
-                    <input type="file" id="resume" class="file-input" accept=".pdf,.doc,.docx">
+                    <h1 id="profile-name">Narayan <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editName()" title="Edit Name"></h1>
+                    <p class="profile-bio" id="profile-bio">Data Engineer <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio"></p>
+                    <p id="profile-location" style="margin-top: 0.5rem;">Location: Not set <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editLocation()" title="Edit Location"></p>
+                    <p id="profile-skill-hours" style="margin-top: 0.5rem;">Skill Hours: 0 <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editSkillHours()" title="Edit Skill Hours"></p>
                     <a href="#" id="resume-link" class="resume-link" style="display: none"><i class="fas fa-file-download"></i> Download Resume</a>
                 </div>
             </section>
@@ -119,7 +155,18 @@
                         <label for="addSkillName">Skill Name:</label>
                         <input type="text" id="addSkillName" name="skill_name" required>
                         <label for="addExperienceLevel">Experience Level:</label>
-                        <input type="text" id="addExperienceLevel" name="experience_level" required>
+                        <select id="addExperienceLevel" name="experience_level" required>
+                            <option value="beginner">Beginner Friendly</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="expert">Expert Level</option>
+                        </select>
+                        <label for="addSkillType">Skill Type:</label>
+                        <select id="addSkillType" name="skill_type" required>
+                            <option value="design">Design & Creative</option>
+                            <option value="tech">Technology</option>
+                            <option value="language">Languages</option>
+                            <option value="business">Business</option>
+                        </select>
                         <label for="addSpecialties">Specialties:</label>
                         <input type="text" id="addSpecialties" name="specialties" required>
                         <label for="addAvailability">Availability:</label>
@@ -141,10 +188,32 @@
                 <div id="skills-list"></div>
             </section>
 
-            <section class="calendar-section">
+            <section class="availability-section">
                 <h2>📅 Availability</h2>
-                <div id="calendar"></div>
+                <button onclick="openAddAvailabilityModal()" class="add-availability-btn"><i class="fas fa-plus"></i> Add Availability</button>
+                <div id="availability-container">
+                    <h3>Availability Slots</h3>
+                    <ul id="availability-list" style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0; padding: 10px; background: var(--glass-bg); border-radius: 5px;">Loading...</li>
+                    </ul>
+                </div>
             </section>
+
+            <div id="addAvailabilityModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeAddAvailabilityModal()">×</span>
+                    <h2>Add New Availability</h2>
+                    <form id="addAvailabilityForm">
+                        <label for="addStartTime">Start Time:</label>
+                        <input type="datetime-local" id="addStartTime" name="start_time" required>
+                        <label for="addEndTime">End Time:</label>
+                        <input type="datetime-local" id="addEndTime" name="end_time" required>
+                        <label for="addDescription">Description:</label>
+                        <input type="text" id="addDescription" name="description">
+                        <button type="submit">Add Availability</button>
+                    </form>
+                </div>
+            </div>
 
             <section class="badges-section">
                 <h2>🏆 Trust & Recognition</h2>
@@ -180,7 +249,18 @@
                 <label for="editSkillName">Skill Name:</label>
                 <input type="text" id="editSkillName" name="skill_name" required>
                 <label for="editExperienceLevel">Experience Level:</label>
-                <input type="text" id="editExperienceLevel" name="experience_level" required>
+                <select id="editExperienceLevel" name="experience_level" required>
+                    <option value="beginner">Beginner Friendly</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="expert">Expert Level</option>
+                </select>
+                <label for="editSkillType">Skill Type:</label>
+                <select id="editSkillType" name="skill_type" required>
+                    <option value="design">Design & Creative</option>
+                    <option value="tech">Technology</option>
+                    <option value="language">Languages</option>
+                    <option value="business">Business</option>
+                </select>
                 <label for="editSpecialties">Specialties:</label>
                 <input type="text" id="editSpecialties" name="specialties" required>
                 <label for="editAvailability">Availability:</label>
@@ -199,6 +279,18 @@
     <script>
         let currentSkills = [];
 
+        function previewProfilePhoto(src) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal', 'active');
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 80%; text-align: center;">
+                    <span class="close-btn" onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 10px;">×</span>
+                    <img src="${src}" alt="Profile Preview" style="max-width: 100%; max-height: 80vh; border-radius: 10px;">
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
         function openAddSkillModal() {
             document.getElementById('addSkillModal').classList.add('active');
         }
@@ -213,6 +305,7 @@
             if (skill) {
                 document.getElementById('editSkillName').value = skill.skill_name;
                 document.getElementById('editExperienceLevel').value = skill.experience_level;
+                document.getElementById('editSkillType').value = skill.skill_type || 'design';
                 document.getElementById('editSpecialties').value = skill.specialties;
                 document.getElementById('editAvailability').value = skill.availability;
                 document.getElementById('editCertifications').value = skill.certifications || '';
@@ -227,11 +320,153 @@
             document.getElementById('editSkillModal').classList.remove('active');
         }
 
+        function openAddAvailabilityModal() {
+            document.getElementById('addAvailabilityModal').classList.add('active');
+        }
+
+        function closeAddAvailabilityModal() {
+            document.getElementById('addAvailabilityModal').classList.remove('active');
+            document.getElementById('addAvailabilityForm').reset();
+        }
+
+        async function fetchProfileData() {
+            try {
+                console.log('Fetching profile data...');
+                const response = await fetch('/api/profile?t=' + Date.now(), {
+                    credentials: 'include',
+                    headers: { 
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                if (!response.ok) throw new Error(`Failed to fetch profile data: ${response.status} - ${response.statusText}`);
+                const data = await response.json();
+                console.log('Fetched profile data:', data);
+
+                currentSkills = data.skills || [];
+                document.getElementById('profile-name').innerHTML = `${data.full_name || 'Narayan'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editName()" title="Edit Name">`;
+                document.getElementById('profile-bio').innerHTML = `${data.bio || 'Data Engineer'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio">`;
+                document.getElementById('profile-location').innerHTML = `Location: ${data.location || 'Not set'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editLocation()" title="Edit Location">`;
+                document.getElementById('profile-skill-hours').innerHTML = `Skill Hours: ${data.skill_hours || 0} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editSkillHours()" title="Edit Skill Hours">`;
+                const profileAvatar = document.getElementById('profile-avatar');
+                profileAvatar.src = data.profile_picture ? `http://127.0.0.1:5000${data.profile_picture}` : '/images/default-avatar.png';
+                profileAvatar.onerror = () => profileAvatar.src = 'https://via.placeholder.com/120';
+                const resumeLink = document.getElementById('resume-link');
+                if (data.resume) {
+                    resumeLink.href = `http://127.0.0.1:5000${data.resume}`;
+                    resumeLink.style.display = 'inline-block';
+                } else {
+                    resumeLink.style.display = 'none';
+                }
+
+                const skillsList = document.getElementById('skills-list');
+                skillsList.innerHTML = currentSkills.map(skill => `
+                    <div class="skill-card" data-skill-id="${skill.skill_id}">
+                        <div class="skill-actions">
+                            <button onclick="openEditSkillModal('${skill.skill_id}')"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteSkill('${skill.skill_id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="skill-tag">${skill.skill_name}</div>
+                        <p><strong>Experience Level:</strong> ${skill.experience_level}</p>
+                        <p><strong>Skill Type:</strong> ${skill.skill_type || 'N/A'}</p>
+                        <p><strong>Specialties:</strong> ${skill.specialties}</p>
+                        <p><strong>Availability:</strong> ${skill.availability}</p>
+                        ${skill.certifications ? `<p><strong>Certifications:</strong> ${skill.certifications}</p>` : ''}
+                        ${skill.description ? `<p><strong>Description:</strong> ${skill.description}</p>` : ''}
+                        ${skill.portfolio ? `<a href="${skill.portfolio}" class="portfolio-link" target="_blank">View Portfolio →</a>` : ''}
+                    </div>
+                `).join('') || '<p>No skills added yet.</p>';
+
+                showSimpleAvailability();
+            } catch (error) {
+                console.error('Profile data error:', error);
+                alert('Failed to load profile data. Please refresh the page or log in again.');
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function showSimpleAvailability() {
+            const availabilityList = document.getElementById('availability-list');
+            availabilityList.innerHTML = '<li style="margin: 10px 0; padding: 10px; background: var(--glass-bg); border-radius: 5px;">Loading...</li>';
+
+            try {
+                const response = await fetch('/api/availability', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
+                if (!response.ok) throw new Error(`Failed to fetch availability: ${response.status} - ${response.statusText}`);
+                const availability = await response.json();
+                console.log('Fetched availability for simple display:', availability);
+
+                if (availability.length === 0) {
+                    availabilityList.innerHTML = '<li>No availability slots available.</li>';
+                } else {
+                    availabilityList.innerHTML = availability.map(event => `
+                        <li class="availability-item">
+                            <span>${new Date(event.start_time).toLocaleString()} to ${new Date(event.end_time).toLocaleString()} - ${event.description || 'Available'}</span>
+                            <button onclick="deleteAvailability('${event._id}')" style="background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Delete</button>
+                        </li>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching availability for simple display:', error);
+                availabilityList.innerHTML = '<li>Failed to load availability. Please try again.</li>';
+            }
+        }
+
+        async function addAvailability(startTime, endTime, description = 'Available') {
+            try {
+                const response = await fetch('/api/add_availability', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+                    body: JSON.stringify({
+                        start_time: startTime,
+                        end_time: endTime,
+                        description: description
+                    }),
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    await showSimpleAvailability();
+                    alert('Availability added successfully!');
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to add availability: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error adding availability:', error);
+                alert('Failed to add availability. Please try again.');
+            }
+        }
+
+        async function deleteAvailability(availabilityId) {
+            try {
+                const response = await fetch(`/api/delete_availability/${availabilityId}`, {
+                    method: 'DELETE',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    await showSimpleAvailability();
+                    alert('Availability deleted successfully!');
+                } else {
+                    alert('Failed to delete availability');
+                }
+            } catch (error) {
+                console.error('Error deleting availability:', error);
+                alert('Failed to delete availability. Please try again.');
+            }
+        }
+
         document.getElementById('addSkillForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
                 skill_name: document.getElementById('addSkillName').value,
                 experience_level: document.getElementById('addExperienceLevel').value,
+                skill_type: document.getElementById('addSkillType').value,
                 specialties: document.getElementById('addSpecialties').value,
                 availability: document.getElementById('addAvailability').value,
                 certifications: document.getElementById('addCertifications').value,
@@ -242,7 +477,7 @@
             try {
                 const response = await fetch('/api/add_skill', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
                     body: JSON.stringify(formData),
                     credentials: 'include'
                 });
@@ -267,6 +502,7 @@
             const formData = {
                 skill_name: document.getElementById('editSkillName').value,
                 experience_level: document.getElementById('editExperienceLevel').value,
+                skill_type: document.getElementById('editSkillType').value,
                 specialties: document.getElementById('editSpecialties').value,
                 availability: document.getElementById('editAvailability').value,
                 certifications: document.getElementById('editCertifications').value,
@@ -277,7 +513,7 @@
             try {
                 const response = await fetch(`/api/update_skill/${skillId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
                     body: JSON.stringify(formData),
                     credentials: 'include'
                 });
@@ -301,6 +537,7 @@
             try {
                 const response = await fetch(`/api/delete_skill/${skillId}`, {
                     method: 'DELETE',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
                     credentials: 'include'
                 });
 
@@ -313,54 +550,6 @@
             } catch (error) {
                 console.error('Error deleting skill:', error);
                 alert('Failed to delete skill. Please try again.');
-            }
-        }
-
-        async function fetchProfileData() {
-            try {
-                const response = await fetch('/api/profile', { credentials: 'include' });
-                if (!response.ok) throw new Error(`Failed to fetch profile data: ${response.status} - ${response.statusText}`);
-                
-                const data = await response.json();
-                currentSkills = data.skills || [];
-
-                document.getElementById('profile-name').textContent = data.full_name || 'Narayan';
-                document.getElementById('profile-bio').textContent = data.bio || 'Data Engineer';
-                const profileAvatar = document.getElementById('profile-avatar');
-                const profilePicture = data.profile_picture || "https://via.placeholder.com/120";
-                console.log('Profile picture path from API:', profilePicture);
-                console.log('Constructed URL for image:', profilePicture.startsWith('/uploads') ? `http://127.0.0.1:5000${profilePicture}` : profilePicture);
-                
-                profileAvatar.src = profilePicture.startsWith('/uploads') ? `http://127.0.0.1:5000${profilePicture}` : profilePicture;
-                console.log('Image src set to:', profileAvatar.src);
-                
-                const resumeLink = document.getElementById('resume-link');
-                if (data.resume) {
-                    resumeLink.href = data.resume.startsWith('/uploads') ? `http://127.0.0.1:5000${data.resume}` : data.resume;
-                    resumeLink.style.display = 'inline-block';
-                } else {
-                    resumeLink.style.display = 'none';
-                }
-
-                const skillsList = document.getElementById('skills-list');
-                skillsList.innerHTML = currentSkills.map(skill => `
-                    <div class="skill-card" data-skill-id="${skill.skill_id}">
-                        <div class="skill-actions">
-                            <button onclick="openEditSkillModal('${skill.skill_id}')"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteSkill('${skill.skill_id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="skill-tag">${skill.skill_name}</div>
-                        <p><strong>Experience Level:</strong> ${skill.experience_level}</p>
-                        <p><strong>Specialties:</strong> ${skill.specialties}</p>
-                        <p><strong>Availability:</strong> ${skill.availability}</p>
-                        ${skill.certifications ? `<p><strong>Certifications:</strong> ${skill.certifications}</p>` : ''}
-                        ${skill.description ? `<p><strong>Description:</strong> ${skill.description}</p>` : ''}
-                        ${skill.portfolio ? `<a href="${skill.portfolio}" class="portfolio-link" target="_blank">View Portfolio →</a>` : ''}
-                    </div>
-                `).join('') || '<p>No skills added yet.</p>';
-            } catch (error) {
-                console.error('Profile data error:', error);
-                alert('Failed to load profile data. Please refresh the page or log in again.');
             }
         }
 
@@ -381,7 +570,7 @@
                 if (response.ok) {
                     const result = await response.json();
                     if (updateField === 'profile_picture') {
-                        document.getElementById('profile-avatar').src = result.path.startsWith('/uploads') ? `http://127.0.0.1:5000${result.path}` : result.path;
+                        document.getElementById('profile-avatar').src = result.path.startsWith('/uploads') ? `http://127.0.0.1:5000${result.path}` : '/images/default-avatar.png';
                     }
                     await fetchProfileData();
                     alert('Upload successful!');
@@ -400,15 +589,16 @@
 
         async function updateProfileField(field, value) {
             try {
+                console.log(`Updating ${field} to: ${value}`);
                 const response = await fetch('/api/update_profile', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
                     body: JSON.stringify({ [field]: value }),
                     credentials: 'include'
                 });
-
                 if (!response.ok) throw new Error(`Update failed: ${response.status} - ${response.statusText}`);
                 await fetchProfileData();
+                alert('Profile updated successfully!');
             } catch (error) {
                 console.error('Update error:', error);
                 alert('Failed to update profile. Please try again.');
@@ -416,28 +606,43 @@
         }
 
         function editName() {
-            const newName = prompt("Enter new name:", document.getElementById('profile-name').textContent);
+            const newName = prompt("Enter new name:", document.getElementById('profile-name').textContent.trim());
             if (newName) updateProfileField('full_name', newName);
         }
 
         function editBio() {
-            const newBio = prompt("Enter new bio:", document.getElementById('profile-bio').textContent);
+            const newBio = prompt("Enter new bio:", document.getElementById('profile-bio').textContent.trim());
             if (newBio) updateProfileField('bio', newBio);
         }
 
+        function editLocation() {
+            const newLocation = prompt("Enter new location:", document.getElementById('profile-location').textContent.replace('Location: ', '').trim());
+            if (newLocation) updateProfileField('location', newLocation);
+        }
+
+        function editSkillHours() {
+            const currentHours = parseInt(document.getElementById('profile-skill-hours').textContent.replace('Skill Hours: ', '').trim()) || 0;
+            const newHours = prompt("Enter new skill hours:", currentHours);
+            if (newHours !== null && !isNaN(newHours) && parseInt(newHours) >= 0) {
+                updateProfileField('skill_hours', parseInt(newHours));
+            } else {
+                alert('Please enter a valid non-negative number for skill hours.');
+            }
+        }
+
+        document.getElementById('addAvailabilityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const startTime = document.getElementById('addStartTime').value;
+            const endTime = document.getElementById('addEndTime').value;
+            const description = document.getElementById('addDescription').value;
+
+            await addAvailability(startTime, endTime, description);
+            closeAddAvailabilityModal();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                initialView: 'timeGridWeek',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
-                events: []
-            });
-            calendar.render();
-            fetchProfileData(); // Force data reload on page load
+            fetchProfileData();
         });
     </script>
-    <!-- FullCalendar CDN Scripts with local fallback -->
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/core/main.js'"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/daygrid/main.js'"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/timegrid/main.js'"></script>
 </body>
 </html>
