@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile View - SkillSwap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Rubik+Dirt&family=Sriracha&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #000000;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --glass-modal: rgba(255, 255, 255, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { 
+            min-height: 100vh; 
+            background-image: url('/uploads/P1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
+            padding: 2rem 2rem 2rem 0; 
+        }
+        .dashboard-wrapper { display: flex; gap: 2rem; position: relative; }
+        .sidebar { width: 250px; background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 15px; padding: 1.5rem; height: calc(100vh - 4rem); position: sticky; top: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .sidebar-nav { list-style: none; margin-top: 2rem; }
+        .nav-item { margin: 0.8rem 0; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.3s ease; }
+        .nav-link:hover { background: rgba(52, 152, 219, 0.1); transform: translateX(5px); }
+        .nav-link.active { background: var(--secondary); color: white; }
+        .nav-icon { width: 25px; text-align: center; }
+        .profile-container { flex: 1; max-width: 1200px; margin: 0 auto; display: grid; gap: 2rem; }
+        .profile-header { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--secondary); object-fit: cover; cursor: pointer; }
+        .profile-bio { font-size: 1.1rem; color: var(--primary); }
+        .resume-link { color: var(--secondary); text-decoration: none; margin-top: 1rem; display: inline-block; }
+        .resume-link:hover { text-decoration: underline; }
+        .connect-btn { 
+            background: #fff;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transform: skew(-21deg);
+            margin-top: 1rem;
+            color: #000;
+            display: inline-block;
+            position: relative;
+        }
+        .connect-btn span {
+            display: inline-block;
+            transform: skew(21deg);
+        }
+        .connect-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            left: 0;
+            background: #000;
+            opacity: 0;
+            z-index: -1;
+            transition: all 0.5s;
+        }
+        .connect-btn:hover {
+            color: #fff;
+        }
+        .connect-btn:hover::before {
+            left: 0;
+            right: 0;
+            opacity: 1;
+        }
+        .connect-btn.disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .connect-btn.disabled:hover {
+            color: #fff;
+        }
+        .connect-btn.disabled::before {
+            background: #666;
+        }
+        .connected-label {
+            margin-top: 1rem;
+            color: var(--success);
+            font-weight: 600;
+            display: inline-block;
+        }
+        .pending-label {
+            margin-top: 1rem;
+            color: #666;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .skills-section { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; position: relative; }
+        .skills-section h2 { display: inline-flex; align-items: center; gap: 0.5rem; }
+        .skill-card { background: rgba(255, 255, 255, 0.1); padding: 1.5rem; margin: 1rem 0; border-radius: 10px; position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .skill-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .skill-tag { background: var(--secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin-bottom: 1rem; }
+        .badges-section { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; }
+        .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.2rem; margin: 0.5rem; border-radius: 25px; background: rgba(255,255,255,0.2); }
+        .badge.gold { background: #ffd700; color: #000; }
+        .badge.silver { background: #c0c0c0; color: #000; }
+        .badge.verified { background: var(--success); color: white; }
+        .badge.trusted { background: #3498db; color: white; }
+        .badge.mentor { background: #9b59b6; color: white; }
+        .badge.ambassador { background: #e67e22; color: white; }
+        .reviews-section { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; }
+        .review-card { background: rgba(255,255,255,0.1); padding: 1rem; margin: 1rem 0; border-radius: 10px; }
+        .review-rating { color: #ffd700; }
+        .rubik-dirt-regular { font-family: "Rubik Dirt", system-ui; font-weight: 400; font-style: normal; }
+        .itim-regular { font-family: "Itim", cursive; font-weight: 400; font-style: normal; }
+        @media (max-width: 768px) {
+            .dashboard-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .profile-header { grid-template-columns: 1fr; text-align: center; }
+            .profile-avatar { margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <h2>SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item"><a href="/dashboard.html" class="nav-link"><i class="nav-icon fas fa-home"></i>Dashboard</a></li>
+                <li class="nav-item"><a href="/profile.html" class="nav-link"><i class="nav-icon fas fa-user"></i>My Profile</a></li>
+                <li class="nav-item"><a href="/search.html" class="nav-link"><i class="nav-icon fas fa-search"></i>Search Skills</a></li>
+                <li class="nav-item"><a href="/exchange.html" class="nav-link"><i class="nav-icon fas fa-exchange-alt"></i>My Exchanges</a></li>
+                <li class="nav-item"><a href="/messages.html" class="nav-link active"><i class="nav-icon fas fa-comments"></i>Messages</a></li>
+                <li class="nav-item"><a href="/reviews.html" class="nav-link"><i class="nav-icon fas fa-star"></i>Reviews</a></li>
+                <li class="nav-item"><a href="/setting.html" class="nav-link"><i class="nav-icon fas fa-cog"></i>Settings</a></li>
+                <li class="nav-item" style="margin-top: 2rem;"><a href="/login.html" class="nav-link"><i class="nav-icon fas fa-sign-out-alt"></i>Logout</a></li>
+            </ul>
+        </nav>
+
+        <div class="profile-container">
+            <section class="profile-header">
+                <div>
+                    <img src="/images/default-avatar.png" alt="Profile Picture" class="profile-avatar" id="profile-avatar" 
+                         onerror="this.src='https://via.placeholder.com/120'; console.error('Default avatar failed to load, falling back to placeholder');" 
+                         onclick="previewProfilePhoto(this.src)">
+                </div>
+                <div>
+                    <h1 id="profile-name">User Name</h1>
+                    <p class="profile-bio" id="profile-bio">Bio not set</p>
+                    <p id="profile-location" style="margin-top: 0.5rem;">Location: Not set</p>
+                    <p id="profile-skill-hours" style="margin-top: 0.5rem;">Skill Hours: 0</p>
+                    <a href="#" id="resume-link" class="resume-link" style="display: none"><i class="fas fa-file-download"></i> Download Resume</a>
+                    <div id="connection-status">
+                        <button class="connect-btn" onclick="connectWithUser()"><span>Connect</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="skills-section">
+                <h2>🛠️ Skills Offered</h2>
+                <div id="skills-offered-list"></div>
+            </section>
+
+            <section class="skills-section">
+                <h2>🔍 Skills Required</h2>
+                <div id="skills-required-list"></div>
+            </section>
+
+            <section class="badges-section">
+                <h2>🏆 Trust & Recognition</h2>
+                <div id="badges-list"></div>
+            </section>
+
+            <section class="reviews-section">
+                <h2>⭐ Reviews</h2>
+                <div id="reviews-list"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+        let viewedUserId = null;
+
+        async function fetchConnectionStatus() {
+            try {
+                const response = await fetch(`/api/connection_status?receiver_id=${viewedUserId}`, {
+                    credentials: 'include',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch connection status');
+                const data = await response.json();
+                return data.status; // Expected values: 'none', 'pending', 'accepted'
+            } catch (error) {
+                console.error('Error fetching connection status:', error);
+                return 'none'; // Default to 'none' if there's an error
+            }
+        }
+
+        async function updateConnectionUI(status) {
+            const connectionStatusDiv = document.getElementById('connection-status');
+            connectionStatusDiv.innerHTML = ''; // Clear existing content
+
+            if (status === 'none') {
+                connectionStatusDiv.innerHTML = `
+                    <button class="connect-btn" onclick="connectWithUser()"><span>Connect</span></button>
+                `;
+            } else if (status === 'pending') {
+                connectionStatusDiv.innerHTML = `
+                    <button class="connect-btn disabled" disabled><span>Pending</span></button>
+                `;
+            } else if (status === 'accepted') {
+                connectionStatusDiv.innerHTML = `
+                    <span class="connected-label">Connected</span>
+                `;
+            }
+        }
+
+        async function fetchProfileData() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                viewedUserId = urlParams.get('userId');
+                if (!viewedUserId) {
+                    alert('No user ID provided.');
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                // Fetch current user's ID to determine if they are viewing their own profile
+                const currentUserResponse = await fetch('/api/profile', { credentials: 'include' });
+                if (!currentUserResponse.ok) throw new Error('Failed to fetch current user data');
+                const currentUserData = await currentUserResponse.json();
+                currentUserId = currentUserData.id;
+
+                // If the user is viewing their own profile, redirect to profile.html
+                if (currentUserId === viewedUserId) {
+                    window.location.href = '/profile.html';
+                    return;
+                }
+
+                // Fetch the viewed user's profile data
+                const response = await fetch(`/api/profile/${viewedUserId}`, {
+                    credentials: 'include',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch profile data');
+                const data = await response.json();
+
+                // Fetch connection status
+                const connectionStatus = await fetchConnectionStatus();
+                await updateConnectionUI(connectionStatus);
+
+                document.getElementById('profile-name').textContent = data.full_name || 'User Name';
+                document.getElementById('profile-bio').textContent = data.bio || 'Bio not set';
+                document.getElementById('profile-location').textContent = `Location: ${data.location || 'Not set'}`;
+                document.getElementById('profile-skill-hours').textContent = `Skill Hours: ${data.skill_hours || 0}`;
+                const profileAvatar = document.getElementById('profile-avatar');
+                profileAvatar.src = data.profile_picture ? `http://127.0.0.1:5000${data.profile_picture}` : '/images/default-avatar.png';
+                profileAvatar.onerror = () => profileAvatar.src = 'https://via.placeholder.com/120';
+                const resumeLink = document.getElementById('resume-link');
+                if (data.resume) {
+                    resumeLink.href = `http://127.0.0.1:5000${data.resume}`;
+                    resumeLink.style.display = 'inline-block';
+                } else {
+                    resumeLink.style.display = 'none';
+                }
+
+                const offeredSkills = (data.skills || []).filter(skill => skill.skill_role === 'offered');
+                const requiredSkills = (data.skills || []).filter(skill => skill.skill_role === 'required');
+
+                document.getElementById('skills-offered-list').innerHTML = offeredSkills.length > 0 ? offeredSkills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-tag">${skill.skill_name}</div>
+                        <p><strong><span class="rubik-dirt-regular">Experience Level:</span></strong> <span class="itim-regular">${skill.experience_level || 'N/A'}</span></p>
+                        <p><strong><span class="rubik-dirt-regular">Skill Type:</span></strong> <span class="itim-regular">${skill.skill_type || 'N/A'}</span></p>
+                        <p><strong><span class="rubik-dirt-regular">Specialties:</span></strong> <span class="itim-regular">${skill.specialties || 'N/A'}</span></p>
+                        <p><strong><span class="rubik-dirt-regular">Availability:</span></strong> <span class="itim-regular">${skill.availability || 'N/A'}</span></p>
+                        <p><strong><span class="rubik-dirt-regular">Certifications:</span></strong> <span class="itim-regular">${skill.certifications || 'N/A'}</span></p>
+                        <p><strong><span class="rubik-dirt-regular">Description:</span></strong> <span class="itim-regular">${skill.description || 'N/A'}</span></p>
+                        ${skill.portfolio ? `<a href="${skill.portfolio}" class="portfolio-link" target="_blank">View Portfolio →</a>` : ''}
+                    </div>
+                `).join('') : '<p>No skills offered yet.</p>';
+
+                document.getElementById('skills-required-list').innerHTML = requiredSkills.length > 0 ? requiredSkills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-tag">${skill.skill_name}</div>
+                    </div>
+                `).join('') : '<p>No skills required yet.</p>';
+
+                // Placeholder for badges (since badges aren't part of the API response yet)
+                document.getElementById('badges-list').innerHTML = `
+                    <div class="badge gold"><i class="fas fa-star"></i> Top Swapper 2024</div>
+                    <div class="badge verified"><i class="fas fa-check"></i> ID Verified</div>
+                    <div class="badge trusted"><i class="fas fa-handshake"></i> Trusted Swapper</div>
+                    <div class="badge mentor"><i class="fas fa-chalkboard-teacher"></i> Mentor in UI/UX</div>
+                    <div class="badge ambassador"><i class="fas fa-award"></i> SkillSwap Ambassador</div>
+                `;
+
+                // Placeholder for reviews (since reviews aren't part of the API response yet)
+                document.getElementById('reviews-list').innerHTML = `
+                    <div class="review-card">
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p>"Great collaborator! Helped me with UI design."</p>
+                        <p class="review-author">- Anonymous</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Profile data error:', error);
+                alert('Failed to load profile data. Please try again.');
+                window.location.href = '/dashboard.html';
+            }
+        }
+
+        function previewProfilePhoto(src) {
+            const modal = document.createElement('div');
+            modal.classList.add('modal', 'active');
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 80%; text-align: center;">
+                    <span class="close-btn" onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 10px;">×</span>
+                    <img src="${src}" alt="Profile Preview" style="max-width: 100%; max-height: 80vh; border-radius: 10px;">
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function connectWithUser() {
+            if (!viewedUserId || !currentUserId) {
+                alert('User ID not found. Please refresh the page and try again.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/send_connection_request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ receiver_id: viewedUserId }),
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    alert('Connection request sent successfully!');
+                    await updateConnectionUI('pending'); // Update UI to show "Pending"
+                    window.location.href = `/messages.html?receiver_id=${viewedUserId}&receiver_name=${document.getElementById('profile-name').textContent}`;
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to send connection request: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error sending connection request:', error);
+                alert('Failed to send connection request. Please try again.');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchProfileData();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SkillSwap</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --white: #ffffff; /* For Bootstrap compatibility */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: url('/uploads/P1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
+            padding: 2rem 2rem 2rem 0;
+            min-height: 100vh;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Sidebar Styles from dashboard.html */
+        .sidebar {
+            width: 80px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 1.5rem 0;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 3000;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            margin-top: 2rem;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin: 0.8rem 0;
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            justify-content: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-text {
+            display: none;
+        }
+
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 90px;
+            background: rgba(0, 0, 0, 1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 3100;
+        }
+
+        .nav-link:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Settings Content Styles */
+        .settings-content {
+            flex: 1;
+            max-width: calc(100% - 80px);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .settings-header {
+            margin-bottom: 2rem;
+        }
+
+        .settings-title {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-subtitle {
+            font-size: 1rem;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .settings-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .settings-tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            position: relative;
+            color: var(--primary);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .settings-tab.active {
+            opacity: 1;
+            color: var(--secondary);
+        }
+
+        .settings-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--secondary);
+        }
+
+        .settings-tab:hover:not(.active) {
+            opacity: 0.9;
+        }
+
+        .settings-panel {
+            display: none;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .payment-methods {
+            margin-top: 2rem;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .payment-method-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-method-icon {
+            font-size: 1.5rem;
+        }
+
+        .payment-method-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .notification-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .notification-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .notification-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .notification-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .notification-slider {
+            background-color: var(--secondary);
+        }
+
+        input:checked + .notification-slider:before {
+            transform: translateX(26px);
+        }
+
+        .delete-account {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .delete-account p {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content .form-actions {
+            justify-content: flex-end;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        /* Responsive Styles from dashboard.html */
+        @media (max-width: 768px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: space-around;
+                padding: 1rem;
+            }
+
+            .settings-content {
+                max-width: 100%;
+            }
+
+            .settings-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link::after {
+                display: none;
+            }
+
+            .sidebar-logo {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <h2 class="sidebar-logo">SkillSwap</h2>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link" data-tooltip="Dashboard">
+                        <i class="nav-icon fas fa-home"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile.html" class="nav-link" data-tooltip="My Profile">
+                        <i class="nav-icon fas fa-user"></i>
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/search.html" class="nav-link" data-tooltip="Search Skills">
+                        <i class="nav-icon fas fa-search"></i>
+                        <span class="nav-text">Search Skills</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/exchange.html" class="nav-link" data-tooltip="My Exchanges">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        <span class="nav-text">My Exchanges</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/messages.html" class="nav-link" data-tooltip="Messages">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <span class="nav-text">Messages</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="/settings.html" class="nav-link active" data-tooltip="Settings">
+                        <i class="nav-icon fas fa-cog"></i>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="#" class="nav-link" onclick="logout()" data-tooltip="Logout">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="settings-content">
+            <div class="settings-header">
+                <h1 class="settings-title">Account Settings</h1>
+                <p class="settings-subtitle">Manage your SkillSwap account preferences</p>
+            </div>
+
+            <div class="settings-tabs">
+                <div class="settings-tab active" data-tab="security">Security</div>
+                <div class="settings-tab" data-tab="payments">Payments</div>
+                <div class="settings-tab" data-tab="notifications">Notifications</div>
+                <div class="settings-tab" data-tab="privacy">Privacy</div>
+            </div>
+
+            <div class="settings-panel active" id="security-panel">
+                <h2>Security Settings</h2>
+                <p>Manage your password and account security.</p>
+                
+                <form id="securityForm">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" required>
+                        <small style="color: var(--primary); opacity: 0.8;">
+                            Must be at least 8 characters, with uppercase, lowercase, number, and special character (@$!%*?&).
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-panel" id="payments-panel">
+                <h2>Payment Methods</h2>
+                <p>Manage your payment methods for skill swaps.</p>
+                
+                <div class="payment-methods" id="paymentMethodsList">
+                    <!-- Payment methods will be dynamically inserted here -->
+                </div>
+                <button class="btn btn-primary" onclick="openPaymentModal('add')">Add Payment Method</button>
+            </div>
+
+            <div class="settings-panel" id="notifications-panel">
+                <h2>Notification Preferences</h2>
+                <p>Choose how you receive notifications from SkillSwap.</p>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>New Messages</p>
+                        <small>Get notified when you receive new messages</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" checked>
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>Contract Updates</p>
+                        <small>Get notified about contract status changes</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" checked>
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>New Connection Requests</p>
+                        <small>Get notified when someone wants to connect</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" checked>
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>SkillSwap News</p>
+                        <small>Get occasional updates about SkillSwap</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox">
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-panel" id="privacy-panel">
+                <h2>Privacy Settings</h2>
+                <p>Control your privacy and data sharing preferences.</p>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>Public Profile</p>
+                        <small>Make your profile visible to other SkillSwap users</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" checked>
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>Show Skill Hours</p>
+                        <small>Display your available skill hours on your profile</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox" checked>
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="notification-item">
+                    <div>
+                        <p>Show Completed Swaps</p>
+                        <small>Display your swap history on your profile</small>
+                    </div>
+                    <label class="notification-toggle">
+                        <input type="checkbox">
+                        <span class="notification-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="delete-account">
+                    <h3>Delete Account</h3>
+                    <p>Permanently delete your SkillSwap account and all associated data.</p>
+                    <button class="btn btn-danger">Delete My Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h2 id="paymentModalTitle">Add Payment Method</h2>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="cardType">Card Type</label>
+                    <select id="cardType" required>
+                        <option value="">Select Card Type</option>
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">Mastercard</option>
+                        <option value="amex">Amex</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="Enter last 4 digits for demo" required>
+                    <small style="color: var(--primary); opacity: 0.8;">
+                        Enter last 4 digits for testing (e.g., 4242). Full card number in real apps would be handled securely.
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="expiryDate">Expiry Date (MM/YYYY)</label>
+                    <input type="text" id="expiryDate" placeholder="MM/YYYY" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePaymentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                const panelId = `${tab.dataset.tab}-panel`;
+                document.getElementById(panelId).classList.add('active');
+                if (tab.dataset.tab === 'payments') {
+                    loadPaymentMethods();
+                }
+            });
+        });
+
+        // Security form submission
+        document.getElementById('securityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirm password do not match.');
+                return;
+            }
+            try {
+                const response = await fetch('/api/update_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    }),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Password updated successfully!');
+                    document.getElementById('securityForm').reset();
+                } else {
+                    alert(`Failed to update password: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                alert('Error updating password. Please try again.');
+            }
+        });
+
+        // Cancel button for security form
+        document.querySelector('#securityForm .btn-secondary').addEventListener('click', () => {
+            document.getElementById('securityForm').reset();
+        });
+
+        // Load payment methods
+        async function loadPaymentMethods() {
+            try {
+                const response = await fetch('/api/payment_methods', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const paymentMethods = await response.json();
+                const paymentMethodsList = document.getElementById('paymentMethodsList');
+                paymentMethodsList.innerHTML = '';
+                if (!response.ok) {
+                    paymentMethodsList.innerHTML = '<p>No payment methods found.</p>';
+                    return;
+                }
+                paymentMethods.forEach(method => {
+                    const methodElement = document.createElement('div');
+                    methodElement.className = 'payment-method';
+                    methodElement.innerHTML = `
+                        <div class="payment-method-info">
+                            <i class="payment-method-icon fab fa-cc-${method.card_type}"></i>
+                            <div>
+                                <p>${method.card_type.charAt(0).toUpperCase() + method.card_type.slice(1)} ending in ${method.last_four}</p>
+                                <small>Expires ${method.expiry_date}</small>
+                            </div>
+                        </div>
+                        <div class="payment-method-actions">
+                            <button class="btn btn-secondary" onclick="openPaymentModal('edit', '${method.id}', '${method.card_type}', '${method.last_four}', '${method.expiry_date}')">Edit</button>
+                            <button class="btn btn-danger" onclick="removePaymentMethod('${method.id}')">Remove</button>
+                        </div>
+                    `;
+                    paymentMethodsList.appendChild(methodElement);
+                });
+            } catch (error) {
+                console.error('Error loading payment methods:', error);
+                alert('Error loading payment methods.');
+            }
+        }
+
+        // Open payment modal
+        function openPaymentModal(mode, id = '', cardType = '', lastFour = '', expiryDate = '') {
+            const modal = document.getElementById('paymentModal');
+            const title = document.getElementById('paymentModalTitle');
+            const form = document.getElementById('paymentForm');
+            const cardTypeInput = document.getElementById('cardType');
+            const cardNumberInput = document.getElementById('cardNumber');
+            const expiryDateInput = document.getElementById('expiryDate');
+
+            title.textContent = mode === 'add' ? 'Add Payment Method' : 'Edit Payment Method';
+            cardTypeInput.value = cardType;
+            cardNumberInput.value = lastFour;
+            expiryDateInput.value = expiryDate;
+
+            form.dataset.mode = mode;
+            form.dataset.id = id;
+            modal.classList.add('show');
+        }
+
+        // Close payment modal
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('show');
+            document.getElementById('paymentForm').reset();
+            delete document.getElementById('paymentForm').dataset.mode;
+            delete document.getElementById('paymentForm').dataset.id;
+        }
+
+        // Handle payment form submission
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const mode = e.target.dataset.mode;
+            const id = e.target.dataset.id;
+            const cardType = document.getElementById('cardType').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+
+            try {
+                const url = mode === 'add' ? '/api/payment_methods' : `/api/payment_methods/${id}`;
+                const method = mode === 'add' ? 'POST' : 'PUT';
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        card_type: cardType,
+                        card_number: cardNumber,
+                        expiry_date: expiryDate
+                    }),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(mode === 'add' ? 'Payment method added successfully!' : 'Payment method updated successfully!');
+                    closePaymentModal();
+                    loadPaymentMethods();
+                } else {
+                    alert(`Failed to ${mode === 'add' ? 'add' : 'update'} payment method: ${result.error}`);
+                }
+            } catch (error) {
+                console.error(`Error ${mode === 'add' ? 'adding' : 'updating'} payment method:`, error);
+                alert(`Error ${mode === 'add' ? 'adding' : 'updating'} payment method.`);
+            }
+        });
+
+        // Remove payment method
+        async function removePaymentMethod(id) {
+            if (!confirm('Are you sure you want to remove this payment method?')) return;
+            try {
+                const response = await fetch(`/api/payment_methods/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Payment method removed successfully!');
+                    loadPaymentMethods();
+                } else {
+                    alert(`Failed to remove payment method: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error removing payment method:', error);
+                alert('Error removing payment method.');
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    console.error('Logout failed:', response.statusText);
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('Error during logout. Please try again.');
+            }
+        }
+    </script>
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

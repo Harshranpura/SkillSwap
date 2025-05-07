@@ -4,135 +4,622 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - SkillSwap</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
+            --primary: #000000;
+            --secondary: #000000;
             --success: #27ae60;
             --danger: #e74c3c;
-            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.2);
             --modal-bg: rgba(0, 0, 0, 0.5);
+            --glass-modal: rgba(255, 255, 255, 0.1);
+            --white: #ffffff; /* For Bootstrap compatibility */
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 2rem 2rem 2rem 0; }
-        .dashboard-wrapper { display: flex; gap: 2rem; position: relative; }
-        .sidebar { width: 250px; background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 15px; padding: 1.5rem; height: calc(100vh - 4rem); position: sticky; top: 2rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
-        .sidebar-nav { list-style: none; margin-top: 2rem; }
-        .nav-item { margin: 0.8rem 0; }
-        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 8px; color: var(--primary); text-decoration: none; transition: all 0.3s ease; }
-        .nav-link:hover { background: rgba(52, 152, 219, 0.1); transform: translateX(5px); }
-        .nav-link.active { background: var(--secondary); color: white; }
-        .nav-icon { width: 25px; text-align: center; }
-        .profile-container { flex: 1; max-width: 1200px; margin: 0 auto; display: grid; gap: 2rem; }
-        .profile-header { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; }
-        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--secondary); object-fit: cover; cursor: pointer; }
-        .profile-bio { font-size: 1.1rem; color: var(--primary); }
-        .file-input { display: none; }
-        .custom-icon { width: 24px; height: 24px; cursor: pointer; margin-top: 1rem; margin-right: 1rem; vertical-align: middle; transition: opacity 0.3s ease; }
-        .custom-icon:hover { opacity: 0.7; }
-        .edit-icon { width: 16px; height: 16px; cursor: pointer; margin-left: 0.5rem; vertical-align: middle; transition: opacity 0.3s ease; }
-        .edit-icon:hover { opacity: 0.7; }
-        .resume-link { color: var(--secondary); text-decoration: none; margin-top: 1rem; display: inline-block; }
-        .resume-link:hover { text-decoration: underline; }
-        .skills-section { background: var(--glass-bg); backdrop-filter: blur(12px); padding: 2rem; border-radius: 15px; }
-        .skill-card { background: rgba(255,255,255,0.1); padding: 1.5rem; margin: 1rem 0; border-radius: 10px; position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .skill-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
-        .skill-tag { background: var(--secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; display: inline-block; margin: 0.2rem; }
-        .skill-actions { position: absolute; top: 1rem; right: 1rem; display: flex; gap: 0.5rem; }
-        .skill-actions button { background: none; border: none; cursor: pointer; color: var(--primary); }
-        .skill-actions button:hover { color: var(--secondary); }
-        .add-skill-btn { background: var(--secondary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
-        .add-skill-btn:hover { background: var(--primary); }
-        .availability-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
-        #availability-list {
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-image: url('/uploads/P1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
+            padding: 2rem 2rem 2rem 0;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+        }
+
+        /* Sidebar Styles from dashboard.html */
+        .sidebar {
+            width: 80px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 1.5rem 0;
+            height: calc(100vh - 4rem);
+            position: sticky;
+            top: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 3000;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .sidebar-nav {
             list-style: none;
+            margin-top: 2rem;
             padding: 0;
         }
-        .availability-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
+
+        .nav-item {
+            margin: 0.8rem 0;
+            position: relative;
+        }
+
+        .nav-link {
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            justify-content: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-text {
+            display: none;
+        }
+
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 90px;
+            background: rgba(0, 0, 0, 1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 3100;
+        }
+
+        .nav-link:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Profile Content Styles */
+        .profile-container {
+            flex: 1;
+            max-width: calc(100% - 80px);
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .profile-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
             align-items: center;
         }
-        .availability-item button {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            margin-left: 10px;
+
+        .profile-avatar-container {
+            position: relative;
+            text-align: center;
         }
-        .availability-item button:hover {
-            background: darken(var(--danger), 10%);
-        }
-        .add-availability-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 25px;
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--secondary);
+            object-fit: cover;
             cursor: pointer;
-            font-size: 1rem;
+        }
+
+        .profile-avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
             display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--secondary);
+            cursor: pointer;
+        }
+
+        .profile-avatar-placeholder i {
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+
+        .profile-bio {
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .custom-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            margin-top: 1rem;
+            margin-right: 1rem;
+            vertical-align: middle;
+            transition: opacity 0.3s ease;
+        }
+
+        .custom-icon:hover {
+            opacity: 0.7;
+        }
+
+        .edit-icon {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            transition: opacity 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            opacity: 0.7;
+        }
+
+        .resume-link {
+            color: var(--secondary);
+            text-decoration: none;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .resume-link:hover {
+            text-decoration: underline;
+        }
+
+        .skills-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .skills-section h2 {
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .skill-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .skill-tag {
+            background: var(--secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .skill-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .skill-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-actions img {
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .skill-actions img:hover {
+            opacity: 1;
+        }
+
+        .add-skill-btn {
+            background: #fff;
+            border: none;
+            padding: 6px 10px;
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            width: 175px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transform: skew(-21deg);
+            position: relative;
+            margin: 0.5rem 0;
+            color: #000;
+        }
+
+        .add-skill-btn span {
+            display: inline-block;
+            transform: skew(21deg);
+        }
+
+        .add-skill-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            left: 0;
+            background: #000;
+            opacity: 0;
+            z-index: -1;
+            transition: all 0.5s;
+        }
+
+        .add-skill-btn:hover {
+            color: #fff;
+        }
+
+        .add-skill-btn:hover::before {
+            left: 0;
+            right: 0;
+            opacity: 1;
+        }
+
+        .add-skill-btn i {
+            margin-right: 6px;
+            display: inline-block;
+            transform: skew(21deg);
+            font-size: 12px;
+        }
+
+        .badges-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .badge.certified {
+            background: var(--success);
+            color: white;
+        }
+
+        .reviews-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+        }
+
+        .review-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+        }
+
+        .review-rating {
+            color: #ffd700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--modal-bg);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--glass-modal);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 1rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            color: var(--primary);
+        }
+
+        .modal-content h2 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .modal-content label {
+            display: block;
+            margin: 0.5rem 0 0.2rem;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            color: var(--primary);
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        .modal-content textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .modal-content button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
             margin-top: 1rem;
+            transition: background 0.3s ease;
         }
-        .add-availability-btn:hover {
-            background: darken(var(--success), 10%);
+
+        .modal-content button:hover {
+            background: var(--primary);
         }
-        .badges-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
-        .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.2rem; margin: 0.5rem; border-radius: 25px; background: rgba(255,255,255,0.2); }
-        .badge.gold { background: #ffd700; color: #000; }
-        .badge.silver { background: #c0c0c0; color: #000; }
-        .badge.verified { background: var(--success); color: white; }
-        .badge.trusted { background: #3498db; color: white; }
-        .badge.mentor { background: #9b59b6; color: white; }
-        .badge.ambassador { background: #e67e22; color: white; }
-        .reviews-section { background: var(--glass-bg); padding: 2rem; border-radius: 15px; }
-        .review-card { background: rgba(255,255,255,0.1); padding: 1rem; margin: 1rem 0; border-radius: 10px; }
-        .review-rating { color: #ffd700; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg); }
-        .modal.active { display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: white; margin: 1rem; padding: 2rem; border-radius: 15px; width: 100%; max-width: 500px; }
-        .close-btn { color: var(--danger); font-size: 1.5rem; cursor: pointer; position: absolute; top: 1rem; right: 1rem; }
-        .close-btn:hover { color: var(--primary); }
+
+        .modal-content .cancel-btn {
+            background: none;
+            color: var(--danger);
+            margin-right: 0.5rem;
+        }
+
+        .modal-content .cancel-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .close-btn {
+            color: var(--danger);
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+
+        .close-btn:hover {
+            color: var(--primary);
+        }
+
+        .text-danger {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Responsive Styles from dashboard.html */
         @media (max-width: 768px) {
-            .dashboard-wrapper { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .profile-header { grid-template-columns: 1fr; text-align: center; }
-            .profile-avatar { margin: 0 auto; }
-            .custom-icon { display: block; margin: 0.5rem 0; }
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: space-around;
+                padding: 1rem;
+            }
+
+            .profile-container {
+                max-width: 100%;
+            }
+
+            .profile-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .profile-avatar-container {
+                margin: 0 auto;
+            }
+
+            .custom-icon {
+                display: block;
+                margin: 0.5rem 0;
+            }
+
+            .modal-content {
+                max-width: 90%;
+                padding: 1rem;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link::after {
+                display: none;
+            }
+
+            .sidebar-logo {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
         <nav class="sidebar">
-            <h2>SkillSwap</h2>
+            <h2 class="sidebar-logo">SkillSwap</h2>
             <ul class="sidebar-nav">
-                <li class="nav-item"><a href="/dashboard.html" class="nav-link"><i class="nav-icon fas fa-home"></i>Dashboard</a></li>
-                <li class="nav-item"><a href="/profile.html" class="nav-link active"><i class="nav-icon fas fa-user"></i>My Profile</a></li>
-                <li class="nav-item"><a href="/search.html" class="nav-link"><i class="nav-icon fas fa-search"></i>Search Skills</a></li>
-                <li class="nav-item"><a href="/exchange.html" class="nav-link"><i class="nav-icon fas fa-exchange-alt"></i>My Exchanges</a></li>
-                <li class="nav-item"><a href="/messages.html" class="nav-link"><i class="nav-icon fas fa-comments"></i>Messages</a></li>
-                <li class="nav-item"><a href="/reviews.html" class="nav-link"><i class="nav-icon fas fa-star"></i>Reviews</a></li>
-                <li class="nav-item"><a href="/setting.html" class="nav-link"><i class="nav-icon fas fa-cog"></i>Settings</a></li>
-                <li class="nav-item" style="margin-top: 2rem;"><a href="/login.html" class="nav-link"><i class="nav-icon fas fa-sign-out-alt"></i>Logout</a></li>
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link" data-tooltip="Dashboard">
+                        <i class="nav-icon fas fa-home"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile.html" class="nav-link active" data-tooltip="My Profile">
+                        <i class="nav-icon fas fa-user"></i>
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/search.html" class="nav-link" data-tooltip="Search Skills">
+                        <i class="nav-icon fas fa-search"></i>
+                        <span class="nav-text">Search Skills</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/exchange.html" class="nav-link" data-tooltip="My Exchanges">
+                        <i class="nav-icon fas fa-exchange-alt"></i>
+                        <span class="nav-text">My Exchanges</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/messages.html" class="nav-link" data-tooltip="Messages">
+                        <i class="nav-icon fas fa-comments"></i>
+                        <span class="nav-text">Messages</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="/settings.html" class="nav-link" data-tooltip="Settings">
+                        <i class="nav-icon fas fa-cog"></i>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: 2rem;">
+                    <a href="#" class="nav-link" onclick="logout()" data-tooltip="Logout">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <span class="nav-text">Logout</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
         <div class="profile-container">
             <section class="profile-header">
-                <div>
-                    <img src="/images/default-avatar.png" alt="Profile Picture" class="profile-avatar" id="profile-avatar" 
-                         onerror="this.src='https://via.placeholder.com/120'; console.error('Default avatar failed to load, falling back to placeholder');" 
-                         onclick="previewProfilePhoto(this.src)">
+                <div class="profile-avatar-container">
+                    <div id="profile-avatar-placeholder" class="profile-avatar-placeholder" onclick="document.getElementById('profile-photo').click()" style="display: none;">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <img id="profile-avatar" class="profile-avatar" style="display: none;" onclick="previewProfilePhoto(this.src)">
                     <img src="/uploads/camera.png" alt="Camera Icon" class="custom-icon" onclick="document.getElementById('profile-photo').click()" title="Upload Photo">
                     <img src="/uploads/upload.png" alt="Resume Icon" class="custom-icon" onclick="document.getElementById('resume').click()" title="Upload Resume">
                     <input type="file" id="profile-photo" class="file-input" accept="image/*">
@@ -140,105 +627,112 @@
                 </div>
                 <div>
                     <h1 id="profile-name">Narayan <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editName()" title="Edit Name"></h1>
-                    <p class="profile-bio" id="profile-bio">Data Engineer <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio"></p>
-                    <p id="profile-location" style="margin-top: 0.5rem;">Location: Not set <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editLocation()" title="Edit Location"></p>
-                    <p id="profile-skill-hours" style="margin-top: 0.5rem;">Skill Hours: 0 <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editSkillHours()" title="Edit Skill Hours"></p>
+                    <p class="profile-bio" id="profile-bio"> <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio"></p>
+                    <div class="form-group">
+                        <p id="profile-location" style="margin-top: 0.5rem;">Location: Not set <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="openEditLocationModal()" title="Edit Location"></p>
+                        <div id="location-error" class="text-danger" style="display: none;"></div>
+                    </div>
+                    <p id="profile-skill-hours" style="margin-top: 0.5rem;">Skill Hours: 0</p>
                     <a href="#" id="resume-link" class="resume-link" style="display: none"><i class="fas fa-file-download"></i> Download Resume</a>
                 </div>
             </section>
 
-            <div id="addSkillModal" class="modal">
+            <!-- Modal for Editing Location -->
+            <div id="editLocationModal" class="modal">
                 <div class="modal-content">
-                    <span class="close-btn" onclick="closeAddSkillModal()">×</span>
-                    <h2>Add New Skill</h2>
-                    <form id="addSkillForm">
-                        <label for="addSkillName">Skill Name:</label>
-                        <input type="text" id="addSkillName" name="skill_name" required>
-                        <label for="addExperienceLevel">Experience Level:</label>
-                        <select id="addExperienceLevel" name="experience_level" required>
+                    <span class="close-btn" onclick="closeEditLocationModal()">×</span>
+                    <h2>Edit Location</h2>
+                    <form id="editLocationForm">
+                        <label for="editLocationInput">Location:</label>
+                        <input type="text" id="editLocationInput" name="location" placeholder="e.g., New York, NY or Remote" required>
+                        <div id="edit-location-error" class="text-danger" style="display: none;"></div>
+                        <button type="submit">Save Location</button>
+                        <button type="button" class="cancel-btn" onclick="closeEditLocationModal()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal for Adding Skill Offered -->
+            <div id="addSkillOfferedModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeAddSkillOfferedModal()">×</span>
+                    <h2>Add New Skill Offered</h2>
+                    <form id="addSkillOfferedForm">
+                        <label for="addSkillOfferedName">Skill Name:</label>
+                        <input type="text" id="addSkillOfferedName" name="skill_name" required>
+                        <label for="addSkillOfferedRole" style="display: none;">Role:</label>
+                        <select id="addSkillOfferedRole" name="skill_role" style="display: none;" required>
+                            <option value="offered" selected>Skill Offered</option>
+                        </select>
+                        <label for="addOfferedExperienceLevel">Experience Level:</label>
+                        <select id="addOfferedExperienceLevel" name="experience_level" required>
                             <option value="beginner">Beginner Friendly</option>
                             <option value="intermediate">Intermediate</option>
                             <option value="expert">Expert Level</option>
                         </select>
-                        <label for="addSkillType">Skill Type:</label>
-                        <select id="addSkillType" name="skill_type" required>
+                        <label for="addOfferedSkillType">Skill Type:</label>
+                        <select id="addOfferedSkillType" name="skill_type" required>
                             <option value="design">Design & Creative</option>
                             <option value="tech">Technology</option>
                             <option value="language">Languages</option>
                             <option value="business">Business</option>
                         </select>
-                        <label for="addSpecialties">Specialties:</label>
-                        <input type="text" id="addSpecialties" name="specialties" required>
-                        <label for="addAvailability">Availability:</label>
-                        <input type="text" id="addAvailability" name="availability" required>
-                        <label for="addCertifications">Certifications:</label>
-                        <input type="text" id="addCertifications" name="certifications">
-                        <label for="addDescription">Description:</label>
-                        <textarea id="addDescription" name="description"></textarea>
-                        <label for="addPortfolio">Portfolio:</label>
-                        <input type="text" id="addPortfolio" name="portfolio">
-                        <button type="submit">Add Skill</button>
+                        <label for="addOfferedSpecialties">Specialties:</label>
+                        <input type="text" id="addOfferedSpecialties" name="specialties" required>
+                        <label for="addOfferedAvailability">Availability:</label>
+                        <input type="text" id="addOfferedAvailability" name="availability" required>
+                        <label for="addOfferedCertifications">Certifications:</label>
+                        <input type="text" id="addOfferedCertifications" name="certifications">
+                        <label for="addOfferedDescription">Description:</label>
+                        <textarea id="addOfferedDescription" name="description"></textarea>
+                        <label for="addOfferedPortfolio">Portfolio:</label>
+                        <input type="text" id="addOfferedPortfolio" name="portfolio">
+                        <button type="submit" class="add-skill-btn"><span>Add Skill</span></button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal for Adding Skill Required -->
+            <div id="addSkillRequiredModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeAddSkillRequiredModal()">×</span>
+                    <h2>Add New Skill Required</h2>
+                    <form id="addSkillRequiredForm">
+                        <label for="addSkillRequiredName">Skill Name:</label>
+                        <input type="text" id="addSkillRequiredName" name="skill_name" required>
+                        <label for="addSkillRequiredRole" style="display: none;">Role:</label>
+                        <select id="addSkillRequiredRole" name="skill_role" style="display: none;" required>
+                            <option value="required" selected>Skill Required</option>
+                        </select>
+                        <button type="submit" class="add-skill-btn"><span>Add Skill</span></button>
                     </form>
                 </div>
             </div>
 
             <section class="skills-section">
-                <h2>🛠️ Skill Showcase</h2>
-                <button onclick="openAddSkillModal()" class="add-skill-btn"><i class="fas fa-plus"></i> Add Skill</button>
-                <div id="skills-list"></div>
+                <h2>🛠️ Skills Offered</h2>
+                <button onclick="openAddSkillOfferedModal()" class="add-skill-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Skills</span>
+                </button>
+                <div id="skills-offered-list"></div>
             </section>
 
-            <section class="availability-section">
-                <h2>📅 Availability</h2>
-                <button onclick="openAddAvailabilityModal()" class="add-availability-btn"><i class="fas fa-plus"></i> Add Availability</button>
-                <div id="availability-container">
-                    <h3>Availability Slots</h3>
-                    <ul id="availability-list" style="list-style: none; padding: 0;">
-                        <li style="margin: 10px 0; padding: 10px; background: var(--glass-bg); border-radius: 5px;">Loading...</li>
-                    </ul>
-                </div>
+            <section class="skills-section">
+                <h2>🔍 Skills Required</h2>
+                <button onclick="openAddSkillRequiredModal()" class="add-skill-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Required Skills</span>
+                </button>
+                <div id="skills-required-list"></div>
             </section>
-
-            <div id="addAvailabilityModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-btn" onclick="closeAddAvailabilityModal()">×</span>
-                    <h2>Add New Availability</h2>
-                    <form id="addAvailabilityForm">
-                        <label for="addStartTime">Start Time:</label>
-                        <input type="datetime-local" id="addStartTime" name="start_time" required>
-                        <label for="addEndTime">End Time:</label>
-                        <input type="datetime-local" id="addEndTime" name="end_time" required>
-                        <label for="addDescription">Description:</label>
-                        <input type="text" id="addDescription" name="description">
-                        <button type="submit">Add Availability</button>
-                    </form>
-                </div>
-            </div>
 
             <section class="badges-section">
                 <h2>🏆 Trust & Recognition</h2>
-                <div class="badge gold"><i class="fas fa-star"></i> Top Swapper 2024</div>
-                <div class="badge verified"><i class="fas fa-check"></i> ID Verified</div>
-                <div class="badge trusted"><i class="fas fa-handshake"></i> Trusted Swapper</div>
-                <div class="badge mentor"><i class="fas fa-chalkboard-teacher"></i> Mentor in UI/UX</div>
-                <div class="badge ambassador"><i class="fas fa-award"></i> SkillSwap Ambassador</div>
+                <div id="certifications-list"></div>
             </section>
 
-            <section class="reviews-section">
-                <h2>⭐ Reviews</h2>
-                <div class="review-card">
-                    <div class="review-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <p>"Alex is an amazing UI designer! Helped me revamp my app interface in just 10 hours."</p>
-                    <p class="review-author">- Sarah Developer</p>
-                </div>
-            </section>
-        </div>
+            
     </div>
 
     <div id="editSkillModal" class="modal">
@@ -248,28 +742,33 @@
             <form id="editSkillForm">
                 <label for="editSkillName">Skill Name:</label>
                 <input type="text" id="editSkillName" name="skill_name" required>
-                <label for="editExperienceLevel">Experience Level:</label>
-                <select id="editExperienceLevel" name="experience_level" required>
+                <label for="editSkillRole">Role:</label>
+                <select id="editSkillRole" name="skill_role" required>
+                    <option value="offered">Skill Offered</option>
+                    <option value="required">Skill Required</option>
+                </select>
+                <label for="editExperienceLevel" id="editExperienceLevelLabel">Experience Level:</label>
+                <select id="editExperienceLevel" name="experience_level">
                     <option value="beginner">Beginner Friendly</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="expert">Expert Level</option>
                 </select>
-                <label for="editSkillType">Skill Type:</label>
-                <select id="editSkillType" name="skill_type" required>
+                <label for="editSkillType" id="editSkillTypeLabel">Skill Type:</label>
+                <select id="editSkillType" name="skill_type">
                     <option value="design">Design & Creative</option>
                     <option value="tech">Technology</option>
                     <option value="language">Languages</option>
                     <option value="business">Business</option>
                 </select>
-                <label for="editSpecialties">Specialties:</label>
-                <input type="text" id="editSpecialties" name="specialties" required>
-                <label for="editAvailability">Availability:</label>
-                <input type="text" id="editAvailability" name="availability" required>
-                <label for="editCertifications">Certifications:</label>
+                <label for="editSpecialties" id="editSpecialtiesLabel">Specialties:</label>
+                <input type="text" id="editSpecialties" name="specialties">
+                <label for="editAvailability" id="editAvailabilityLabel">Availability:</label>
+                <input type="text" id="editAvailability" name="availability">
+                <label for="editCertifications" id="editCertificationsLabel">Certifications:</label>
                 <input type="text" id="editCertifications" name="certifications">
-                <label for="editDescription">Description:</label>
+                <label for="editDescription" id="editDescriptionLabel">Description:</label>
                 <textarea id="editDescription" name="description"></textarea>
-                <label for="editPortfolio">Portfolio:</label>
+                <label for="editPortfolio" id="editPortfolioLabel">Portfolio:</label>
                 <input type="text" id="editPortfolio" name="portfolio">
                 <button type="submit">Save Changes</button>
             </form>
@@ -278,6 +777,94 @@
 
     <script>
         let currentSkills = [];
+        let currentUserId = null;
+
+        async function fetchProfileData() {
+            try {
+                console.log('Fetching profile data...');
+                const response = await fetch('/api/profile?t=' + Date.now(), {
+                    credentials: 'include',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                if (!response.ok) throw new Error(`Failed to fetch profile data: ${response.status} - ${response.statusText}`);
+                const data = await response.json();
+                console.log('Fetched profile data:', data);
+
+                currentUserId = data.id; // Store the current user's ID
+                currentSkills = data.skills || [];
+
+                document.getElementById('profile-name').innerHTML = `${data.full_name || 'Narayan'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editName()" title="Edit Name">`;
+                document.getElementById('profile-bio').innerHTML = `${data.bio || 'Add your bio'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio">`;
+                document.getElementById('profile-location').innerHTML = `Location: ${data.location || 'Not set'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="openEditLocationModal()" title="Edit Location">`;
+                document.getElementById('profile-skill-hours').innerHTML = `Skill Hours: ${data.skill_hours || 0}`;
+
+                const profileAvatar = document.getElementById('profile-avatar');
+                const profileAvatarPlaceholder = document.getElementById('profile-avatar-placeholder');
+
+                if (data.profile_picture) {
+                    profileAvatar.src = data.profile_picture;
+                    profileAvatar.style.display = 'block';
+                    profileAvatarPlaceholder.style.display = 'none';
+                } else {
+                    profileAvatar.style.display = 'none';
+                    profileAvatarPlaceholder.style.display = 'flex';
+                }
+
+                const resumeLink = document.getElementById('resume-link');
+                if (data.resume) {
+                    resumeLink.href = data.resume;
+                    resumeLink.style.display = 'inline-block';
+                } else {
+                    resumeLink.style.display = 'none';
+                }
+
+                const offeredSkills = currentSkills.filter(skill => skill.skill_role === 'offered');
+                const requiredSkills = currentSkills.filter(skill => skill.skill_role === 'required');
+
+                document.getElementById('skills-offered-list').innerHTML = offeredSkills.length > 0 ? offeredSkills.map(skill => `
+                    <div class="skill-card" data-skill-id="${skill.skill_id}">
+                        <div class="skill-actions">
+                            <button onclick="openEditSkillModal('${skill.skill_id}')"><img src="/uploads/pencil.png" alt="Edit Icon"></button>
+                            <button onclick="deleteSkill('${skill.skill_id}')"><img src="/uploads/bin.png" alt="Delete Icon"></button>
+                        </div>
+                        <div class="skill-tag">${skill.skill_name}</div>
+                        <p><strong>Experience Level:</strong> ${skill.experience_level || 'N/A'}</p>
+                        <p><strong>Skill Type:</strong> ${skill.skill_type || 'N/A'}</p>
+                        <p><strong>Specialties:</strong> ${skill.specialties || 'N/A'}</p>
+                        <p><strong>Availability:</strong> ${skill.availability || 'N/A'}</p>
+                        <p><strong>Certifications:</strong> ${skill.certifications || 'N/A'}</p>
+                        <p><strong>Description:</strong> ${skill.description || 'N/A'}</p>
+                        ${skill.portfolio ? `<a href="${skill.portfolio}" class="portfolio-link" target="_blank">View Portfolio →</a>` : ''}
+                    </div>
+                `).join('') : '<p>No skills offered yet.</p>';
+
+                document.getElementById('skills-required-list').innerHTML = requiredSkills.length > 0 ? requiredSkills.map(skill => `
+                    <div class="skill-card" data-skill-id="${skill.skill_id}">
+                        <div class="skill-actions">
+                            <button onclick="openEditSkillModal('${skill.skill_id}')"><img src="/uploads/pencil.png" alt="Edit Icon"></button>
+                            <button onclick="deleteSkill('${skill.skill_id}')"><img src="/uploads/bin.png" alt="Delete Icon"></button>
+                        </div>
+                        <div class="skill-tag">${skill.skill_name}</div>
+                    </div>
+                `).join('') : '<p>No skills required yet.</p>';
+
+                // Populate Trust & Recognition with certifications
+                const certifications = [...new Set(offeredSkills
+                    .filter(skill => skill.certifications)
+                    .flatMap(skill => skill.certifications.split(',').map(cert => cert.trim()))
+                    .filter(cert => cert))]; // Remove duplicates and empty strings
+                document.getElementById('certifications-list').innerHTML = certifications.length > 0 ? certifications.map(cert => `
+                    <div class="badge certified"><i class="fas fa-certificate"></i> ${cert}</div>
+                `).join('') : '<p>No certifications added yet.</p>';
+            } catch (error) {
+                console.error('Profile data error:', error);
+                alert('Failed to load profile data. Please refresh the page or log in again.');
+                window.location.href = '/login.html';
+            }
+        }
 
         function previewProfilePhoto(src) {
             const modal = document.createElement('div');
@@ -291,27 +878,55 @@
             document.body.appendChild(modal);
         }
 
-        function openAddSkillModal() {
-            document.getElementById('addSkillModal').classList.add('active');
+        function openAddSkillOfferedModal() {
+            document.getElementById('addSkillOfferedModal').classList.add('active');
         }
 
-        function closeAddSkillModal() {
-            document.getElementById('addSkillModal').classList.remove('active');
-            document.getElementById('addSkillForm').reset();
+        function closeAddSkillOfferedModal() {
+            document.getElementById('addSkillOfferedModal').classList.remove('active');
+            document.getElementById('addSkillOfferedForm').reset();
+        }
+
+        function openAddSkillRequiredModal() {
+            document.getElementById('addSkillRequiredModal').classList.add('active');
+        }
+
+        function closeAddSkillRequiredModal() {
+            document.getElementById('addSkillRequiredModal').classList.remove('active');
+            document.getElementById('addSkillRequiredForm').reset();
         }
 
         function openEditSkillModal(skillId) {
             const skill = currentSkills.find(s => s.skill_id === skillId);
             if (skill) {
                 document.getElementById('editSkillName').value = skill.skill_name;
-                document.getElementById('editExperienceLevel').value = skill.experience_level;
-                document.getElementById('editSkillType').value = skill.skill_type || 'design';
-                document.getElementById('editSpecialties').value = skill.specialties;
-                document.getElementById('editAvailability').value = skill.availability;
+                document.getElementById('editSkillRole').value = skill.skill_role || 'offered';
+                document.getElementById('editExperienceLevel').value = skill.experience_level || '';
+                document.getElementById('editSkillType').value = skill.skill_type || '';
+                document.getElementById('editSpecialties').value = skill.specialties || '';
+                document.getElementById('editAvailability').value = skill.availability || '';
                 document.getElementById('editCertifications').value = skill.certifications || '';
                 document.getElementById('editDescription').value = skill.description || '';
                 document.getElementById('editPortfolio').value = skill.portfolio || '';
                 document.getElementById('editSkillForm').dataset.skillId = skillId;
+
+                // Show/hide fields based on skill role
+                const isRequired = skill.skill_role === 'required';
+                document.getElementById('editExperienceLevelLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editExperienceLevel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editSkillTypeLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editSkillType').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editSpecialtiesLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editSpecialties').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editAvailabilityLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editAvailability').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editCertificationsLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editCertifications').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editDescriptionLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editDescription').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editPortfolioLabel').style.display = isRequired ? 'none' : 'block';
+                document.getElementById('editPortfolio').style.display = isRequired ? 'none' : 'block';
+
                 document.getElementById('editSkillModal').classList.add('active');
             }
         }
@@ -320,170 +935,77 @@
             document.getElementById('editSkillModal').classList.remove('active');
         }
 
-        function openAddAvailabilityModal() {
-            document.getElementById('addAvailabilityModal').classList.add('active');
+        function openEditLocationModal() {
+            const currentLocation = document.getElementById('profile-location').textContent.replace('Location: ', '').trim();
+            document.getElementById('editLocationInput').value = currentLocation === 'Not set' ? '' : currentLocation;
+            document.getElementById('editLocationModal').classList.add('active');
         }
 
-        function closeAddAvailabilityModal() {
-            document.getElementById('addAvailabilityModal').classList.remove('active');
-            document.getElementById('addAvailabilityForm').reset();
+        function closeEditLocationModal() {
+            document.getElementById('editLocationModal').classList.remove('active');
+            document.getElementById('editLocationForm').reset();
+            document.getElementById('edit-location-error').style.display = 'none';
         }
 
-        async function fetchProfileData() {
-            try {
-                console.log('Fetching profile data...');
-                const response = await fetch('/api/profile?t=' + Date.now(), {
-                    credentials: 'include',
-                    headers: { 
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache'
-                    }
-                });
-                if (!response.ok) throw new Error(`Failed to fetch profile data: ${response.status} - ${response.statusText}`);
-                const data = await response.json();
-                console.log('Fetched profile data:', data);
-
-                currentSkills = data.skills || [];
-                document.getElementById('profile-name').innerHTML = `${data.full_name || 'Narayan'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editName()" title="Edit Name">`;
-                document.getElementById('profile-bio').innerHTML = `${data.bio || 'Data Engineer'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editBio()" title="Edit Bio">`;
-                document.getElementById('profile-location').innerHTML = `Location: ${data.location || 'Not set'} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editLocation()" title="Edit Location">`;
-                document.getElementById('profile-skill-hours').innerHTML = `Skill Hours: ${data.skill_hours || 0} <img src="/uploads/pencil.png" alt="Pencil Icon" class="edit-icon" onclick="editSkillHours()" title="Edit Skill Hours">`;
-                const profileAvatar = document.getElementById('profile-avatar');
-                profileAvatar.src = data.profile_picture ? `http://127.0.0.1:5000${data.profile_picture}` : '/images/default-avatar.png';
-                profileAvatar.onerror = () => profileAvatar.src = 'https://via.placeholder.com/120';
-                const resumeLink = document.getElementById('resume-link');
-                if (data.resume) {
-                    resumeLink.href = `http://127.0.0.1:5000${data.resume}`;
-                    resumeLink.style.display = 'inline-block';
-                } else {
-                    resumeLink.style.display = 'none';
-                }
-
-                const skillsList = document.getElementById('skills-list');
-                skillsList.innerHTML = currentSkills.map(skill => `
-                    <div class="skill-card" data-skill-id="${skill.skill_id}">
-                        <div class="skill-actions">
-                            <button onclick="openEditSkillModal('${skill.skill_id}')"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteSkill('${skill.skill_id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="skill-tag">${skill.skill_name}</div>
-                        <p><strong>Experience Level:</strong> ${skill.experience_level}</p>
-                        <p><strong>Skill Type:</strong> ${skill.skill_type || 'N/A'}</p>
-                        <p><strong>Specialties:</strong> ${skill.specialties}</p>
-                        <p><strong>Availability:</strong> ${skill.availability}</p>
-                        ${skill.certifications ? `<p><strong>Certifications:</strong> ${skill.certifications}</p>` : ''}
-                        ${skill.description ? `<p><strong>Description:</strong> ${skill.description}</p>` : ''}
-                        ${skill.portfolio ? `<a href="${skill.portfolio}" class="portfolio-link" target="_blank">View Portfolio →</a>` : ''}
-                    </div>
-                `).join('') || '<p>No skills added yet.</p>';
-
-                showSimpleAvailability();
-            } catch (error) {
-                console.error('Profile data error:', error);
-                alert('Failed to load profile data. Please refresh the page or log in again.');
-                window.location.href = '/login.html';
-            }
-        }
-
-        async function showSimpleAvailability() {
-            const availabilityList = document.getElementById('availability-list');
-            availabilityList.innerHTML = '<li style="margin: 10px 0; padding: 10px; background: var(--glass-bg); border-radius: 5px;">Loading...</li>';
-
-            try {
-                const response = await fetch('/api/availability', {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-                });
-                if (!response.ok) throw new Error(`Failed to fetch availability: ${response.status} - ${response.statusText}`);
-                const availability = await response.json();
-                console.log('Fetched availability for simple display:', availability);
-
-                if (availability.length === 0) {
-                    availabilityList.innerHTML = '<li>No availability slots available.</li>';
-                } else {
-                    availabilityList.innerHTML = availability.map(event => `
-                        <li class="availability-item">
-                            <span>${new Date(event.start_time).toLocaleString()} to ${new Date(event.end_time).toLocaleString()} - ${event.description || 'Available'}</span>
-                            <button onclick="deleteAvailability('${event._id}')" style="background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Delete</button>
-                        </li>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error fetching availability for simple display:', error);
-                availabilityList.innerHTML = '<li>Failed to load availability. Please try again.</li>';
-            }
-        }
-
-        async function addAvailability(startTime, endTime, description = 'Available') {
-            try {
-                const response = await fetch('/api/add_availability', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-                    body: JSON.stringify({
-                        start_time: startTime,
-                        end_time: endTime,
-                        description: description
-                    }),
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    await showSimpleAvailability();
-                    alert('Availability added successfully!');
-                } else {
-                    const errorData = await response.json();
-                    alert(`Failed to add availability: ${errorData.error}`);
-                }
-            } catch (error) {
-                console.error('Error adding availability:', error);
-                alert('Failed to add availability. Please try again.');
-            }
-        }
-
-        async function deleteAvailability(availabilityId) {
-            try {
-                const response = await fetch(`/api/delete_availability/${availabilityId}`, {
-                    method: 'DELETE',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-                    credentials: 'include'
-                });
-
-                if (response.ok) {
-                    await showSimpleAvailability();
-                    alert('Availability deleted successfully!');
-                } else {
-                    alert('Failed to delete availability');
-                }
-            } catch (error) {
-                console.error('Error deleting availability:', error);
-                alert('Failed to delete availability. Please try again.');
-            }
-        }
-
-        document.getElementById('addSkillForm').addEventListener('submit', async (e) => {
+        document.getElementById('addSkillOfferedForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
-                skill_name: document.getElementById('addSkillName').value,
-                experience_level: document.getElementById('addExperienceLevel').value,
-                skill_type: document.getElementById('addSkillType').value,
-                specialties: document.getElementById('addSpecialties').value,
-                availability: document.getElementById('addAvailability').value,
-                certifications: document.getElementById('addCertifications').value,
-                description: document.getElementById('addDescription').value,
-                portfolio: document.getElementById('addPortfolio').value
+                skill_name: document.getElementById('addSkillOfferedName').value,
+                skill_role: document.getElementById('addSkillOfferedRole').value,
+                experience_level: document.getElementById('addOfferedExperienceLevel').value,
+                skill_type: document.getElementById('addOfferedSkillType').value,
+                specialties: document.getElementById('addOfferedSpecialties').value,
+                availability: document.getElementById('addOfferedAvailability').value,
+                certifications: document.getElementById('addOfferedCertifications').value,
+                description: document.getElementById('addOfferedDescription').value,
+                portfolio: document.getElementById('addOfferedPortfolio').value,
             };
 
             try {
                 const response = await fetch('/api/add_skill', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
                     body: JSON.stringify(formData),
-                    credentials: 'include'
+                    credentials: 'include',
                 });
 
                 if (response.ok) {
-                    closeAddSkillModal();
+                    closeAddSkillOfferedModal();
+                    await fetchProfileData();
+                    alert('Skill added successfully!');
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to add skill: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error adding skill:', error);
+                alert('Failed to add skill. Please try again.');
+            }
+        });
+
+        document.getElementById('addSkillRequiredForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                skill_name: document.getElementById('addSkillRequiredName').value,
+                skill_role: document.getElementById('addSkillRequiredRole').value,
+            };
+
+            try {
+                const response = await fetch('/api/add_skill', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    closeAddSkillRequiredModal();
                     await fetchProfileData();
                     alert('Skill added successfully!');
                 } else {
@@ -499,23 +1021,31 @@
         document.getElementById('editSkillForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const skillId = e.target.dataset.skillId;
+            const skillRole = document.getElementById('editSkillRole').value;
             const formData = {
                 skill_name: document.getElementById('editSkillName').value,
-                experience_level: document.getElementById('editExperienceLevel').value,
-                skill_type: document.getElementById('editSkillType').value,
-                specialties: document.getElementById('editSpecialties').value,
-                availability: document.getElementById('editAvailability').value,
-                certifications: document.getElementById('editCertifications').value,
-                description: document.getElementById('editDescription').value,
-                portfolio: document.getElementById('editPortfolio').value
+                skill_role: skillRole,
             };
+
+            if (skillRole === 'offered') {
+                formData.experience_level = document.getElementById('editExperienceLevel').value;
+                formData.skill_type = document.getElementById('editSkillType').value;
+                formData.specialties = document.getElementById('editSpecialties').value;
+                formData.availability = document.getElementById('editAvailability').value;
+                formData.certifications = document.getElementById('editCertifications').value;
+                formData.description = document.getElementById('editDescription').value;
+                formData.portfolio = document.getElementById('editPortfolio').value;
+            }
 
             try {
                 const response = await fetch(`/api/update_skill/${skillId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
                     body: JSON.stringify(formData),
-                    credentials: 'include'
+                    credentials: 'include',
                 });
 
                 if (response.ok) {
@@ -523,11 +1053,53 @@
                     await fetchProfileData();
                     alert('Skill updated successfully!');
                 } else {
-                    alert('Failed to update skill');
+                    const errorData = await response.json();
+                    alert(`Failed to update skill: ${errorData.error}`);
                 }
             } catch (error) {
                 console.error('Error updating skill:', error);
                 alert('Failed to update skill. Please try again.');
+            }
+        });
+
+        document.getElementById('editLocationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const locationInput = document.getElementById('editLocationInput').value.trim();
+            const locationError = document.getElementById('edit-location-error');
+
+            // Validate location
+            if (locationInput && locationInput.toLowerCase() !== 'remote') {
+                if (!/^[a-zA-Z\s,]+$/i.test(locationInput)) {
+                    locationError.textContent = 'Location should contain city name (e.g., New York, NY)';
+                    locationError.style.display = 'block';
+                    return;
+                }
+            }
+
+            locationError.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/update_profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
+                    body: JSON.stringify({ location: locationInput }),
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    closeEditLocationModal();
+                    await fetchProfileData();
+                    alert('Location updated successfully!');
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to update location: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating location:', error);
+                alert('Failed to update location. Please try again.');
             }
         });
 
@@ -538,14 +1110,15 @@
                 const response = await fetch(`/api/delete_skill/${skillId}`, {
                     method: 'DELETE',
                     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-                    credentials: 'include'
+                    credentials: 'include',
                 });
 
                 if (response.ok) {
                     await fetchProfileData();
                     alert('Skill deleted successfully!');
                 } else {
-                    alert('Failed to delete skill');
+                    const errorData = await response.json();
+                    alert(`Failed to delete skill: ${errorData.error}`);
                 }
             } catch (error) {
                 console.error('Error deleting skill:', error);
@@ -564,13 +1137,17 @@
                 const response = await fetch(`/api/upload_${updateField}`, {
                     method: 'POST',
                     body: formData,
-                    credentials: 'include'
+                    credentials: 'include',
                 });
 
                 if (response.ok) {
                     const result = await response.json();
                     if (updateField === 'profile_picture') {
-                        document.getElementById('profile-avatar').src = result.path.startsWith('/uploads') ? `http://127.0.0.1:5000${result.path}` : '/images/default-avatar.png';
+                        const profileAvatar = document.getElementById('profile-avatar');
+                        const profileAvatarPlaceholder = document.getElementById('profile-avatar-placeholder');
+                        profileAvatar.src = result.path;
+                        profileAvatar.style.display = 'block';
+                        profileAvatarPlaceholder.style.display = 'none';
                     }
                     await fetchProfileData();
                     alert('Upload successful!');
@@ -592,9 +1169,12 @@
                 console.log(`Updating ${field} to: ${value}`);
                 const response = await fetch('/api/update_profile', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
                     body: JSON.stringify({ [field]: value }),
-                    credentials: 'include'
+                    credentials: 'include',
                 });
                 if (!response.ok) throw new Error(`Update failed: ${response.status} - ${response.statusText}`);
                 await fetchProfileData();
@@ -606,43 +1186,40 @@
         }
 
         function editName() {
-            const newName = prompt("Enter new name:", document.getElementById('profile-name').textContent.trim());
+            const newName = prompt('Enter new name:', document.getElementById('profile-name').textContent.trim());
             if (newName) updateProfileField('full_name', newName);
         }
 
         function editBio() {
-            const newBio = prompt("Enter new bio:", document.getElementById('profile-bio').textContent.trim());
-            if (newBio) updateProfileField('bio', newBio);
+            const currentBio = document.getElementById('profile-bio').textContent.trim();
+            const newBio = prompt('Enter new bio:', currentBio === 'Add your bio' ? '' : currentBio);
+            if (newBio !== null) updateProfileField('bio', newBio);
         }
 
-        function editLocation() {
-            const newLocation = prompt("Enter new location:", document.getElementById('profile-location').textContent.replace('Location: ', '').trim());
-            if (newLocation) updateProfileField('location', newLocation);
-        }
-
-        function editSkillHours() {
-            const currentHours = parseInt(document.getElementById('profile-skill-hours').textContent.replace('Skill Hours: ', '').trim()) || 0;
-            const newHours = prompt("Enter new skill hours:", currentHours);
-            if (newHours !== null && !isNaN(newHours) && parseInt(newHours) >= 0) {
-                updateProfileField('skill_hours', parseInt(newHours));
-            } else {
-                alert('Please enter a valid non-negative number for skill hours.');
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    console.error('Logout failed:', response.statusText);
+                    alert('Failed to log out. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('Error during logout. Please try again.');
             }
         }
-
-        document.getElementById('addAvailabilityForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const startTime = document.getElementById('addStartTime').value;
-            const endTime = document.getElementById('addEndTime').value;
-            const description = document.getElementById('addDescription').value;
-
-            await addAvailability(startTime, endTime, description);
-            closeAddAvailabilityModal();
-        });
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchProfileData();
         });
     </script>
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

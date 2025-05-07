@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SkillSwap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: url('/uploads/P1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .admin-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .admin-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .ad-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+
+        .preview-video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .ad-list {
+            margin-top: 2rem;
+        }
+
+        .ad-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .ad-card img {
+            width: 100px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .ad-card-content h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .ad-card-content p {
+            margin: 0.2rem 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .ad-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333333;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .back-to-dashboard {
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-to-dashboard:hover {
+            background: #333333;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .analytics-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .analytics-card p {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .table {
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>SkillSwap Admin Dashboard</h1>
+            <a href="/dashboard.html" class="back-to-dashboard"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </header>
+
+        <section class="admin-section">
+            <h2>Platform Analytics</h2>
+            <div class="analytics-grid" id="analyticsGrid">
+                <!-- Analytics data will be dynamically populated here -->
+            </div>
+        </section>
+
+        <section class="admin-section">
+            <h2>Manage Advertisements</h2>
+            <form id="adForm" class="ad-form">
+                <div class="form-group">
+                    <label for="adTitle">Ad Title</label>
+                    <input type="text" id="adTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="adDescription">Ad Description</label>
+                    <textarea id="adDescription" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="adUser">User</label>
+                    <select id="adUser" name="user_id" required>
+                        <option value="">Select User</option>
+                        <!-- User options will be dynamically populated -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="adExpiryDate">Expiry Date</label>
+                    <input type="date" id="adExpiryDate" name="expires_at" required>
+                </div>
+                <div class="form-group">
+                    <label for="adImage">Ad Image</label>
+                    <input type="file" id="adImage" name="image" accept="image/*" required>
+                    <div id="imagePreview" class="file-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="adVideo">Ad Video</label>
+                    <input type="file" id="adVideo" name="video" accept="video/mp4" required>
+                    <div id="videoPreview" class="file-preview"></div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="adStatus">Status</label>
+                    <select id="adStatus" name="status" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <button type="submit" class="btn btn-primary">Upload Advertisement</button>
+                </div>
+            </form>
+
+            <div class="ad-list" id="adList">
+                <!-- Ad list will be dynamically populated here -->
+            </div>
+        </section>
+
+        <section class="admin-section">
+            <h2>User Management</h2>
+            <div id="userList">
+                <!-- User list will be dynamically populated here -->
+            </div>
+        </section>
+    </div>
+
+ <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeEditUserModal()">&times;</button>
+            <h2>Edit User</h2>
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label for="editUserName">Full Name</label>
+                    <input type="text" id="editUserName" name="full_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserSkillHours">Skill Hours</label>
+                    <input type="number" id="editUserSkillHours" name="skill_hours" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="editUserLocation">Location</label>
+                    <input type="text" id="editUserLocation" name="location">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let uploadedImage = null;
+        let uploadedVideo = null;
+        let currentUsers = [];
+        let currentAds = [];
+
+        // Fetch analytics data
+        async function fetchAnalytics() {
+            try {
+                const response = await fetch('/api/analytics', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    displayAnalytics(data);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch analytics:', errorData.error);
+                    alert('Failed to load analytics. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+                alert('Error loading analytics. Please try again.');
+            }
+        }
+
+        // Display analytics
+        function displayAnalytics(data) {
+            const analyticsGrid = document.getElementById('analyticsGrid');
+            analyticsGrid.innerHTML = `
+                <div class="analytics-card">
+                    <h3>Total Users</h3>
+                    <p>${data.total_users}</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Active Swaps</h3>
+                    <p>${data.active_swaps}</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Total Skill Hours</h3>
+                    <p>${data.total_skill_hours}</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Total Revenue</h3>
+                    <p>$${data.total_revenue.toFixed(2)}</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Total Contracts</h3>
+                    <p>${data.total_contracts}</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Pending Payments</h3>
+                    <p>${data.pending_payments}</p>
+                </div>
+            `;
+        }
+
+        // Fetch users
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users', { credentials: 'include' });
+                if (response.ok) {
+                    const users = await response.json();
+                    currentUsers = users;
+                    populateUserSelect(users);
+                    displayUsers(users);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch users:', errorData.error);
+                    alert('Failed to load users. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                alert('Error loading users. Please try again.');
+            }
+        }
+
+        // Populate user select dropdown
+        function populateUserSelect(users) {
+            const userSelect = document.getElementById('adUser');
+            userSelect.innerHTML = '<option value="">Select User</option>';
+            users.forEach(user => {
+                userSelect.innerHTML += `<option value="${user.id}">${user.full_name} (Skill Hours: ${user.skill_hours})</option>`;
+            });
+        }
+
+        // Display users
+        function displayUsers(users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Skill Hours</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>${user.full_name}</td>
+                                <td>${user.skill_hours}</td>
+                                <td>${user.location || 'Remote'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openEditUserModal('${user.id}')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Open edit user modal
+        function openEditUserModal(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (user) {
+                document.getElementById('editUserName').value = user.full_name;
+                document.getElementById('editUserSkillHours').value = user.skill_hours;
+                document.getElementById('editUserLocation').value = user.location || '';
+                document.getElementById('editUserForm').dataset.userId = userId;
+                document.getElementById('editUserModal').classList.add('show');
+            }
+        }
+
+        // Close edit user modal
+        function closeEditUserModal() {
+            document.getElementById('editUserModal').classList.remove('show');
+            document.getElementById('editUserForm').reset();
+            delete document.getElementById('editUserForm').dataset.userId;
+        }
+
+        // Update user
+        async function updateUser(userId, userData) {
+            try {
+                const response = await fetch(`/api/update_user/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData),
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    alert('User updated successfully!');
+                    fetchUsers();
+                    closeEditUserModal();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to update user: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('Error updating user. Please try again.');
+            }
+        }
+
+        // Delete user
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+            try {
+                const response = await fetch(`/api/delete_user/${userId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    alert('User deleted successfully!');
+                    fetchUsers();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to delete user: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Error deleting user. Please try again.');
+            }
+        }
+
+        // Fetch ads
+        async function fetchAds() {
+            try {
+                const response = await fetch('/api/ads', { credentials: 'include' });
+                if (response.ok) {
+                    const ads = await response.json();
+                    currentAds = ads;
+                    displayAds(ads);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch ads:', errorData.error);
+                    alert('Failed to load ads. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching ads:', error);
+                alert('Error loading ads. Please try again.');
+            }
+        }
+
+        // Display ads
+        function displayAds(ads) {
+            const adList = document.getElementById('adList');
+            adList.innerHTML = ads.length > 0 ? ads.map(ad => `
+                <div class="ad-card">
+                    <img src="${ad.image}" alt="${ad.title}">
+                    <div class="ad-card-content">
+                        <h3>${ad.title}</h3>
+                        <p>${ad.description}</p>
+                        <p><small>User: ${ad.user_name} | Expires: ${new Date(ad.expires_at).toLocaleDateString()}</small></p>
+                    </div>
+                    <div class="ad-card-actions">
+                        <button class="btn btn-danger" onclick="deleteAd('${ad.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('') : '<p>No ads found.</p>';
+        }
+
+        // Delete ad
+        async function deleteAd(adId) {
+            if (!confirm('Are you sure you want to delete this ad? This action cannot be undone.')) return;
+            try {
+                const response = await fetch(`/api/admin/delete_ad/${adId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    alert('Ad deleted successfully!');
+                    fetchAds();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to delete ad: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error deleting ad:', error);
+                alert('Error deleting ad. Please try again.');
+            }
+        }
+
+        // Upload files and store them for form submission
+        document.getElementById('adImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = `<img src="${e.target.result}" class="preview-image" alt="Ad Image Preview">`;
+                    uploadedImage = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('adVideo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('videoPreview');
+                    preview.innerHTML = `<video class="preview-video" controls><source src="${e.target.result}" type="video/mp4"></video>`;
+                    uploadedVideo = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Upload ad
+        async function uploadAd(formData) {
+            // First, upload image and video files
+            const imageFormData = new FormData();
+            imageFormData.append('file', uploadedImage);
+            const videoFormData = new FormData();
+            videoFormData.append('file', uploadedVideo);
+
+            try {
+                // Upload image
+                const imageResponse = await fetch('/api/upload_file', {
+                    method: 'POST',
+                    body: imageFormData,
+                    credentials: 'include'
+                });
+                if (!imageResponse.ok) throw new Error('Failed to upload image');
+                const imageData = await imageResponse.json();
+                
+                // Upload video
+                const videoResponse = await fetch('/api/upload_file', {
+                    method: 'POST',
+                    body: videoFormData,
+                    credentials: 'include'
+                });
+                if (!videoResponse.ok) throw new Error('Failed to upload video');
+                const videoData = await videoResponse.json();
+
+                // Now create the ad with the uploaded files
+                const adData = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    user_id: formData.get('user_id'),
+                    image: imageData.path,
+                    video: videoData.path,
+                    status: formData.get('status'),
+                    expires_at: new Date(formData.get('expires_at')).toISOString()
+                };
+
+                const adResponse = await fetch('/api/admin/upload_ad', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(adData),
+                    credentials: 'include'
+                });
+                
+                if (adResponse.ok) {
+                    alert('Ad uploaded successfully!');
+                    resetAdForm();
+                    fetchAds();
+                } else {
+                    const errorData = await adResponse.json();
+                    alert(`Failed to upload ad: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error uploading ad:', error);
+                alert('Error uploading ad. Please try again.');
+            }
+        }
+
+        // Reset ad form
+        function resetAdForm() {
+            document.getElementById('adForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('videoPreview').innerHTML = '';
+            uploadedImage = null;
+            uploadedVideo = null;
+        }
+
+        // Form submission event listeners
+        document.getElementById('adForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!uploadedImage || !uploadedVideo) {
+                alert('Please upload both an image and a video.');
+                return;
+            }
+            const formData = new FormData(this);
+            uploadAd(formData);
+        });
+
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = this.dataset.userId;
+            if (!userId) {
+                alert('User ID not found.');
+                return;
+            }
+            const userData = {
+                full_name: document.getElementById('editUserName').value,
+                skill_hours: parseInt(document.getElementById('editUserSkillHours').value),
+                location: document.getElementById('editUserLocation').value
+            };
+            updateUser(userId, userData);
+        });
+
+        // Set default expiry date (30 days from now)
+        function setDefaultExpiryDate() {
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            document.getElementById('adExpiryDate').valueAsDate = expiryDate;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchAnalytics();
+            fetchUsers();
+            fetchAds();
+            setDefaultExpiryDate();
+        });
+    </script>
+</body>
+</html>

@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkillSwap</title>
+    <!-- Preconnect and Font Import -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>SkillSwap Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #000000;
+            --secondary: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.3);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: url('/uploads/b1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
+            padding: 2rem 2rem 2rem 0;
+            min-height: 100vh;
+        }
+
         .dashboard-wrapper {
             display: flex;
             gap: 2rem;
@@ -13,24 +44,37 @@
         }
 
         .sidebar {
-            width: 250px;
+            width: 80px;
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             border-radius: 15px;
-            padding: 1.5rem;
+            padding: 1.5rem 0;
             height: calc(100vh - 4rem);
             position: sticky;
             top: 2rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 3000;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
         }
 
         .sidebar-nav {
             list-style: none;
             margin-top: 2rem;
+            padding: 0;
         }
 
         .nav-item {
             margin: 0.8rem 0;
+            position: relative;
         }
 
         .nav-link {
@@ -42,11 +86,12 @@
             color: var(--primary);
             text-decoration: none;
             transition: all 0.3s ease;
+            position: relative;
+            justify-content: center;
         }
 
         .nav-link:hover {
             background: rgba(52, 152, 219, 0.1);
-            transform: translateX(5px);
         }
 
         .nav-link.active {
@@ -57,597 +102,484 @@
         .nav-icon {
             width: 25px;
             text-align: center;
+            font-size: 1.2rem;
         }
 
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --glass-bg: rgba(255, 255, 255, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 2rem 2rem 2rem 0;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            flex: 1;
-            max-width: calc(100% - 250px);
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* Swap Tracker Styles */
-        .swap-tracker {
-            grid-column: 1 / -1;
-        }
-
-        .kanban-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .kanban-column {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            min-height: 300px;
-        }
-
-        .task-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 1rem;
-            margin: 0.5rem 0;
-            border-radius: 8px;
-            cursor: move;
-            transition: all 0.2s ease;
-        }
-
-        /* Skill Hours System */
-        .skill-hours {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-        }
-
-        .hour-controls {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .hour-controls button {
-            flex: 1;
-            padding: 0.5rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background: rgba(52, 152, 219, 0.8);
-            color: white;
-            transition: all 0.2s ease;
-        }
-
-        .hour-controls button:hover {
-            background: rgba(41, 128, 185, 0.9);
-        }
-
-        /* Status Messages */
-        .status-message {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 4px;
+        .nav-text {
             display: none;
         }
 
-        .status-message.visible {
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 90px;
+            background: rgba(0, 0, 0, 1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 3100;
+        }
+
+        .nav-link:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dashboard-content {
+            flex: 1;
+            max-width: calc(100% - 80px);
+        }
+
+        .ad-carousel-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .carousel-item {
+            position: relative;
+            height: 400px;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
         }
 
-        .success {
-            background: rgba(46, 204, 113, 0.2);
-            color: var(--success);
-        }
-
-        .error {
-            background: rgba(231, 76, 60, 0.2);
-            color: var(--danger);
-        }
-
-        /* Skill Network Map Styles */
-        #skillMap {
-            height: 400px;
+        .carousel-item video {
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin-top: 1rem;
-            position: relative;
-        }
-
-        .node {
-            fill: #2ecc71;
-            stroke: #fff;
-            stroke-width: 2px;
-            cursor: move;
-            transition: all 0.3s ease;
-        }
-
-        .node.self {
-            fill: #e74c3c;
-        }
-
-        .link {
-            stroke: rgba(52, 152, 219, 0.4);
-            stroke-width: 2;
-        }
-
-        .node-label {
-            font-size: 12px;
-            fill: #2c3e50;
-            font-weight: 500;
-            pointer-events: none;
-        }
-
-        .skill-type-tag {
-            background: #3498db;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            margin-right: 0.5rem;
-        }
-
-        #tooltip {
+            height: 100%;
+            object-fit: cover;
+            display: none;
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px;
-            border-radius: 4px;
-            visibility: hidden;
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 10;
+            top: 0;
+            left: 0;
         }
 
-        /* Responsive Design */
+        .carousel-item:hover img {
+            display: none;
+        }
+
+        .carousel-item:hover video {
+            display: block;
+        }
+
+        .submit-ad-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .submit-ad-btn:hover {
+            background: #333333;
+        }
+
+        .ad-instructions {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            color: var(--primary);
+        }
+
+        .ad-instructions.active {
+            display: block;
+        }
+
+        .featured-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .custom-carousel {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .swap-card {
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .swap-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .swap-card img {
+            width: 80%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* New styles for side-by-side profile pictures */
+        .swap-users {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .user-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .swap-icon {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+
         @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+            .dashboard-wrapper {
+                flex-direction: column;
             }
-            
-            .kanban-board {
-                grid-template-columns: 1fr;
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: space-around;
+                padding: 1rem;
             }
-            
-            .glass-card {
-                grid-column: 1 / -1 !important;
+
+            .dashboard-content {
+                max-width: 100%;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link::after {
+                display: none;
+            }
+
+            .sidebar-logo {
+                display: none;
+            }
+
+            .carousel-item {
+                height: 200px;
             }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <h2>SkillSwap</h2>
+            <h2 class="sidebar-logo">SkillSwap</h2>
             <ul class="sidebar-nav">
                 <li class="nav-item">
-                    <a href="/dashboard.html" class="nav-link active">
+                    <a href="/dashboard.html" class="nav-link active" data-tooltip="Dashboard">
                         <i class="nav-icon fas fa-home"></i>
-                        Dashboard
+                        <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/profile.html" class="nav-link">
+                    <a href="/profile.html" class="nav-link" data-tooltip="My Profile">
                         <i class="nav-icon fas fa-user"></i>
-                        My Profile
+                        <span class="nav-text">My Profile</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/search.html" class="nav-link">
+                    <a href="/search.html" class="nav-link" data-tooltip="Search Skills">
                         <i class="nav-icon fas fa-search"></i>
-                        Search Skills
+                        <span class="nav-text">Search Skills</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/exchange.html" class="nav-link">
+                    <a href="/exchange.html" class="nav-link" data-tooltip="My Exchanges">
                         <i class="nav-icon fas fa-exchange-alt"></i>
-                        My Exchanges
+                        <span class="nav-text">My Exchanges</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/messages.html" class="nav-link">
+                    <a href="/messages.html" class="nav-link" data-tooltip="Messages">
                         <i class="nav-icon fas fa-comments"></i>
-                        Messages
-                        <span class="notification-badge"></span>
+                        <span class="nav-text">Messages</span>
+                        <span class="notification-badge" id="unreadMessagesBadge"></span>
                     </a>
                 </li>
+                
                 <li class="nav-item">
-                    <a href="/reviews.html" class="nav-link">
-                        <i class="nav-icon fas fa-star"></i>
-                        Reviews
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/setting.html" class="nav-link">
+                    <a href="/settings.html" class="nav-link" data-tooltip="Settings">
                         <i class="nav-icon fas fa-cog"></i>
-                        Settings
+                        <span class="nav-text">Settings</span>
                     </a>
                 </li>
                 <li class="nav-item" style="margin-top: 2rem;">
-                    <a href="/login.html" class="nav-link">
+                    <a href="#" class="nav-link" onclick="logout()" data-tooltip="Logout">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
-                        Logout
+                        <span class="nav-text">Logout</span>
                     </a>
                 </li>
             </ul>
         </nav>
 
-        <div class="dashboard-grid">
-            <!-- Skill Network Map -->
-            <div class="glass-card" style="grid-column: span 2">
-                <h2>Skill Network Map</h2>
-                <div id="skillMap"></div>
-            </div>
-
-            <!-- Swap Tracker -->
-            <div class="glass-card swap-tracker">
-                <h2>Swap Tracker</h2>
-                <div class="kanban-board">
-                    <div class="kanban-column" id="todo">
-                        <h3>To-Do</h3>
-                        <div class="task-card" draggable="true">Teach Graphic Design</div>
-                        <div class="task-card" draggable="true">Learn Python Basics</div>
+        <div class="dashboard-content">
+            <div class="ad-carousel-section">
+                <h2>Recent Ads</h2>
+                <div id="recentAdsCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <!-- Ad carousel will be populated dynamically -->
                     </div>
-                    <div class="kanban-column" id="in-progress">
-                        <h3>In Progress</h3>
-                        <div class="task-card" draggable="true">Web Design Swap</div>
-                    </div>
-                    <div class="kanban-column" id="completed">
-                        <h3>Completed</h3>
-                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#recentAdsCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#recentAdsCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
-                <div class="skill-hours">
-                    <strong>Skill Hours: <span id="skillHours">0</span>h</strong>
-                    <p>Location: <span id="userLocation">Remote</span></p>
-                    <div class="hour-controls">
-                        <button data-action="add" data-value="1">+1</button>
-                        <button data-action="add" data-value="5">+5</button>
-                        <button data-action="subtract" data-value="1">-1</button>
-                        <button data-action="subtract" data-value="5">-5</button>
-                    </div>
-                    <div id="hourStatus" class="status-message"></div>
+                <button class="submit-ad-btn" onclick="checkSkillHours()">Submit Ad</button>
+                <div class="ad-instructions" id="adInstructions">
+                    <p><strong>Ad Submission Instructions:</strong></p>
+                    <p>You have enough Skill Hours to submit an ad! Please email your ad materials (image and .mp4 video) to <a href="mailto:ads@skillswap.com">ads@skillswap.com</a>. Ensure the image is high-resolution and the video is under 30 seconds. Our team will review and add your ad to the carousel upon approval.</p>
                 </div>
             </div>
 
-            <!-- Trust and Skill Balance Cards -->
-            <div class="glass-card">
-                <div class="trust-score">
-                    <h2>Skill Balance</h2>
-                    <div class="score-display">1.5:1</div>
-                    <p>Offered: 12h | Requested: 8h</p>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <div class="trust-score">
-                    <h2>Trust Score</h2>
-                    <div class="score-display">88</div>
-                    <p>Completion Rate: 99%</p>
-                </div>
-            </div>
-
-            <!-- Feedback and Portfolio Sections -->
-            <div class="glass-card">
-                <h2>Feedback Exchange</h2>
-                <textarea placeholder="Enter your feedback..." rows="4" id="feedbackInput"></textarea>
-                <button id="submitFeedback">Submit Feedback</button>
-            </div>
-
-            <div class="glass-card">
-                <h2>Skill Portfolio</h2>
-                <ul id="skills-list"></ul>
-                <button id="addCertification">Add Certification</button>
-            </div>
-
-            <!-- Collaboration Wall -->
-            <div class="glass-card" style="grid-column: 1 / -1;">
-                <h2>Collaboration Wall</h2>
-                <div id="collaborationFeed">
-                    <p>🎉 Alex learned Python from Maria!</p>
+            <div class="featured-section">
+                <h2>Featured Skill Swaps</h2>
+                <div class="custom-carousel" id="skillSwapCarousel">
+                    <!-- Skill swaps will be dynamically populated -->
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Tooltip Container -->
-        <div id="tooltip"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        let currentUserId = null;
 
-        <!-- JavaScript Libraries -->
-        <script src="https://d3js.org/d3.v7.min.js" onerror="this.onerror=null; this.src='/js/d3.v7.min.js'"></script>
+        async function fetchCurrentUserId() {
+            try {
+                const response = await fetch('/api/profile', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUserId = data.id;
+                } else {
+                    console.error('Failed to fetch user ID:', await response.text());
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
+                window.location.href = '/login.html';
+            }
+        }
 
-        <!-- Application Script -->
-        <script>
-            document.addEventListener('DOMContentLoaded', async () => {
-                try {
-                    const response = await fetch('/api/profile', { credentials: 'include' });
-                    if (!response.ok) {
-                        throw new Error(response.status === 401 ? 'Unauthorized' : 'Server error');
-                    }
-                    const userData = await response.json();
+        async function fetchRecentAds() {
+            try {
+                const response = await fetch('/api/recent_ads', { credentials: 'include' });
+                if (response.ok) {
+                    const ads = await response.json();
+                    populateAdCarousel(ads);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch ads:', errorData.error);
+                    alert('Failed to load ads. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching ads:', error);
+                alert('Error loading ads. Please try again.');
+            }
+        }
 
-                    // Update dashboard content with user data
-                    document.getElementById('skillHours').textContent = userData.skill_hours || 0;
-                    document.getElementById('userLocation').textContent = userData.location || 'Remote';
-                    document.getElementById('skills-list').innerHTML = (userData.skills && userData.skills.length > 0) 
-                        ? userData.skills.map(skill => `
-                            <li>${skill.skill_name} <span class="skill-type-tag">${skill.skill_type}</span> (${skill.experience_level})</li>
-                        `).join('') 
-                        : '<li>No skills added yet.</li>';
+        function populateAdCarousel(ads) {
+            const carouselInner = document.querySelector('#recentAdsCarousel .carousel-inner');
+            
+            if (ads.length === 0) {
+                carouselInner.innerHTML = `
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/1200x400?text=No+Ads+Available" alt="No Ads Available">
+                        <div class="carousel-caption">
+                            <h5>No Ads Available</h5>
+                            <p>Be the first to submit an ad!</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            carouselInner.innerHTML = ads.map((ad, index) => `
+                <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                    <img src="${ad.image}" alt="${ad.title}">
+                    <video loop muted>
+                        <source src="${ad.video}" type="video/mp4">
+                    </video>
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>${ad.title}</h5>
+                        <p>${ad.description}</p>
+                    </div>
+                </div>
+            `).join('');
 
-                    // Drag-and-Drop Implementation
-                    let draggedItem = null;
-
-                    document.addEventListener('dragstart', e => {
-                        if (e.target.classList.contains('task-card')) {
-                            draggedItem = e.target;
-                            setTimeout(() => e.target.style.opacity = '0.5', 0);
-                        }
+            const carouselItems = document.querySelectorAll('#recentAdsCarousel .carousel-item');
+            carouselItems.forEach(item => {
+                const video = item.querySelector('video');
+                if (video) {
+                    item.addEventListener('mouseenter', () => {
+                        video.play();
                     });
-
-                    document.addEventListener('dragend', e => {
-                        if (e.target.classList.contains('task-card')) {
-                            e.target.style.opacity = '1';
-                            draggedItem = null;
-                        }
+                    item.addEventListener('mouseleave', () => {
+                        video.pause();
+                        video.currentTime = 0;
                     });
-
-                    document.addEventListener('dragover', e => {
-                        e.preventDefault();
-                        const column = e.target.closest('.kanban-column');
-                        if (column && draggedItem) {
-                            const afterElement = getDragAfterElement(column, e.clientY);
-                            if (afterElement) {
-                                column.insertBefore(draggedItem, afterElement);
-                            } else {
-                                column.appendChild(draggedItem);
-                            }
-                        }
-                    });
-
-                    // Skill Hours System
-                    document.querySelectorAll('.hour-controls button').forEach(button => {
-                        button.addEventListener('click', async () => {
-                            const action = button.dataset.action;
-                            const value = parseInt(button.dataset.value);
-                            
-                            try {
-                                const response = await fetch('/api/skill-hours', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action, value }),
-                                    credentials: 'include'
-                                });
-
-                                const data = await response.json();
-                                console.log('Skill hours response:', data); // Debug log
-                                
-                                if (response.ok) {
-                                    document.getElementById('skillHours').textContent = data.hours || 0;
-                                    showStatus(`Success! New balance: ${data.hours || 0}h`, 'success');
-                                } else {
-                                    throw new Error(data.error || 'Transaction failed');
-                                }
-                            } catch (error) {
-                                console.error('Skill hours error:', error);
-                                showStatus(error.message, 'error');
-                            }
-                        });
-                    });
-
-                    // Feedback Submission
-                    document.getElementById('submitFeedback').addEventListener('click', async () => {
-                        const feedback = document.getElementById('feedbackInput').value.trim();
-                        if (!feedback) {
-                            alert('Feedback cannot be empty.');
-                            return;
-                        }
-                        try {
-                            const response = await fetch('/api/submit-feedback', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ feedback }),
-                                credentials: 'include'
-                            });
-
-                            if (response.ok) {
-                                alert('Feedback submitted successfully!');
-                                document.getElementById('feedbackInput').value = '';
-                            } else {
-                                const data = await response.json();
-                                alert(`Failed to submit feedback: ${data.error}`);
-                            }
-                        } catch (error) {
-                            console.error('Feedback submission error:', error);
-                            alert('Failed to submit feedback. Please try again.');
-                        }
-                    });
-
-                    // Initialize Skill Map
-                    initSkillMap(userData.skills || []);
-                } catch (error) {
-                    console.error('Dashboard initialization error:', error);
-                    if (error.message === 'Unauthorized') {
-                        alert('Please log in to access the dashboard.');
-                        window.location.href = '/login.html';
-                    } else {
-                        alert('Failed to load dashboard. Please check the console for details.');
-                    }
                 }
             });
+        }
 
-            // Skill Map Implementation
-            function initSkillMap(skills) {
-                const container = document.getElementById('skillMap');
-                const width = container.clientWidth;
-                const height = 400;
-
-                const svg = d3.select("#skillMap")
-                    .html('')
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
-
-                // Data based on user skills
-                const nodes = [
-                    { id: "You", type: "self", x: width/2, y: height/2 },
-                    ...skills.map((skill, i) => ({
-                        id: `${skill.skill_name} (${skill.skill_type || 'N/A'})`,
-                        type: "connection",
-                        x: width/2 + (i * 50 - 100),
-                        y: height/2 + (i * 50 - 100),
-                        details: skill || {}
-                    }))
-                ].slice(0, 5); // Limit to 5 nodes for simplicity
-
-                const links = nodes.slice(1).map(node => ({ source: "You", target: node.id }));
-
-                // Force Simulation
-                const simulation = d3.forceSimulation(nodes)
-                    .force("link", d3.forceLink(links).id(d => d.id).distance(100))
-                    .force("charge", d3.forceManyBody().strength(-30))
-                    .force("center", d3.forceCenter(width/2, height/2));
-
-                // Draw Elements
-                const link = svg.append("g")
-                    .selectAll("line")
-                    .data(links)
-                    .enter().append("line")
-                    .attr("class", "link")
-                    .attr("stroke-width", 2);
-
-                const node = svg.append("g")
-                    .selectAll("circle")
-                    .data(nodes)
-                    .enter().append("circle")
-                    .attr("class", d => `node ${d.type}`)
-                    .attr("r", 20)
-                    .on("mouseover", (event, d) => {
-                        if (d.details) {
-                            const tooltip = document.getElementById('tooltip');
-                            tooltip.style.visibility = 'visible';
-                            tooltip.innerHTML = `
-                                <strong>${d.id}</strong><br>
-                                Experience: ${d.details.experience_level || 'N/A'}<br>
-                                Type: ${d.details.skill_type || 'N/A'}<br>
-                                Specialties: ${d.details.specialties || 'N/A'}<br>
-                                Availability: ${d.details.availability || 'N/A'}<br>
-                                Certifications: ${d.details.certifications || 'N/A'}
-                            `;
-                            tooltip.style.left = (event.pageX + 10) + "px";
-                            tooltip.style.top = (event.pageY - 28) + "px";
-                        }
-                    })
-                    .on("mouseout", () => {
-                        document.getElementById('tooltip').style.visibility = 'hidden';
-                    })
-                    .call(drag(simulation));
-
-                const labels = svg.append("g")
-                    .selectAll("text")
-                    .data(nodes)
-                    .enter().append("text")
-                    .attr("class", "node-label")
-                    .text(d => d.id)
-                    .attr("dx", 25)
-                    .attr("dy", 5);
-
-                // Simulation Update
-                simulation.on("tick", () => {
-                    link.attr("x1", d => d.source.x)
-                        .attr("y1", d => d.source.y)
-                        .attr("x2", d => d.target.x)
-                        .attr("y2", d => d.target.y);
-
-                    node.attr("cx", d => d.x)
-                        .attr("cy", d => d.y);
-
-                    labels.attr("x", d => d.x)
-                        .attr("y", d => d.y);
-                });
-
-                // Drag Behavior
-                function drag(simulation) {
-                    return d3.drag()
-                        .on("start", (event, d) => {
-                            if (!event.active) simulation.alphaTarget(0.3).restart();
-                            d.fx = d.x;
-                            d.fy = d.y;
-                        })
-                        .on("drag", (event, d) => {
-                            d.fx = event.x;
-                            d.fy = event.y;
-                        })
-                        .on("end", (event, d) => {
-                            if (!event.active) simulation.alphaTarget(0);
-                            d.fx = null;
-                            d.fy = null;
-                        });
+        async function fetchFeaturedSwaps() {
+            try {
+                const response = await fetch('/api/featured_skill_swaps', { credentials: 'include' });
+                if (response.ok) {
+                    const swaps = await response.json();
+                    populateFeaturedSwaps(swaps);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch featured swaps:', errorData.error);
+                    alert('Failed to load featured swaps. Please try again.');
                 }
+            } catch (error) {
+                console.error('Error fetching featured swaps:', error);
+                alert('Error loading featured swaps. Please try again.');
+            }
+        }
+
+        function populateFeaturedSwaps(swaps) {
+            const skillSwapCarousel = document.getElementById('skillSwapCarousel');
+            
+            if (swaps.length === 0) {
+                skillSwapCarousel.innerHTML = `
+                    <div class="swap-card">
+                        <p>No completed swaps yet.</p>
+                    </div>
+                `;
+                return;
             }
 
-            // Helper Functions
-            function getDragAfterElement(column, y) {
-                const cards = column.querySelectorAll('.task-card:not(.dragging)');
-                return Array.from(cards).reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-                    return offset < 0 && offset > closest.offset ? 
-                        { offset, element: child } : closest;
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-
-            function showStatus(message, type) {
-                const statusDiv = document.getElementById('hourStatus');
-                statusDiv.textContent = message;
-                statusDiv.className = `status-message visible ${type}`;
+            skillSwapCarousel.innerHTML = swaps.map(swap => {
+                const title = `${swap.sender_name}'s ${swap.sender_skill_offered} for ${swap.receiver_name}'s ${swap.receiver_skill_offered}`;
+                const completedDate = new Date(swap.completed_at).toLocaleDateString();
+                const senderPic = swap.sender_profile_picture || 'https://via.placeholder.com/50';
+                const receiverPic = swap.receiver_profile_picture || 'https://via.placeholder.com/50';
                 
-                setTimeout(() => {
-                    statusDiv.className = 'status-message';
-                }, 3000);
+                return `
+                    <div class="swap-card">
+                        <div class="swap-users">
+                            <div class="user-profile">
+                                <img src="${senderPic}" alt="${swap.sender_name}" class="user-avatar">
+                                <span>${swap.sender_name}</span>
+                            </div>
+                            <div class="swap-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="user-profile">
+                                <img src="${receiverPic}" alt="${swap.receiver_name}" class="user-avatar">
+                                <span>${swap.receiver_name}</span>
+                            </div>
+                        </div>
+                        <h3>${title}</h3>
+                        <p>Completed on ${completedDate}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function checkSkillHours() {
+            try {
+                const response = await fetch('/api/profile', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    const skillHours = data.skill_hours || 0;
+                    const adInstructions = document.getElementById('adInstructions');
+                    if (skillHours >= 10) {
+                        adInstructions.classList.add('active');
+                    } else {
+                        alert(`You need at least 10 Skill Hours to submit an ad. You currently have ${skillHours} Skill Hours.`);
+                    }
+                } else {
+                    console.error('Failed to fetch profile:', await response.text());
+                    alert('Failed to load profile. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error checking Skill Hours:', error);
+                alert('Error checking Skill Hours. Please try again.');
             }
-        </script>
-        <!-- FullCalendar CDN Scripts with local fallback (if needed for this page) -->
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/core/main.js'"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/daygrid/main.js'"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid/main.js" onerror="this.onerror=null; this.src='/js/fullcalendar/timegrid/main.js'"></script>
-    </body>
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    console.error('Failed to logout:', await response.text());
+                    alert('Failed to logout. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                alert('Error logging out. Please try again.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchCurrentUserId();
+            fetchRecentAds();
+            fetchFeaturedSwaps();
+        });
+    </script>
+</body>
 </html>

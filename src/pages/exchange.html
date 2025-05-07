@@ -4,19 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Exchanges - SkillSwap</title>
+    <!-- Add Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
     <style>
-        /* Reuse existing styles from the dashboard */
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --glass-bg: rgba(255, 255, 255, 0.15);
+            --primary: #000000;
+            --secondary: #000000;
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+            --white: #ffffff; /* For Bootstrap carousel compatibility */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-image: url('/uploads/P1.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #000;
             padding: 2rem 2rem 2rem 0;
-            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
         }
 
         .dashboard-wrapper {
@@ -25,26 +44,39 @@
             position: relative;
         }
 
-        /* Sidebar (reused from other pages) */
+        /* Sidebar Styles from dashboard.html */
         .sidebar {
-            width: 250px;
+            width: 80px;
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
-            padding: 1.5rem;
             border-radius: 15px;
+            padding: 1.5rem 0;
             height: calc(100vh - 4rem);
             position: sticky;
             top: 2rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 3000;
+        }
+
+        .sidebar-logo {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            opacity: 0;
         }
 
         .sidebar-nav {
             list-style: none;
             margin-top: 2rem;
+            padding: 0;
         }
 
         .nav-item {
             margin: 0.8rem 0;
+            position: relative;
         }
 
         .nav-link {
@@ -56,6 +88,12 @@
             color: var(--primary);
             text-decoration: none;
             transition: all 0.3s ease;
+            position: relative;
+            justify-content: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(52, 152, 219, 0.1);
         }
 
         .nav-link.active {
@@ -63,10 +101,53 @@
             color: white;
         }
 
-        /* Exchange Content */
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-text {
+            display: none;
+        }
+
+        .nav-link::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 90px;
+            background: rgba(0, 0, 0, 1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 3100;
+        }
+
+        .nav-link:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .notification-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Exchange Content Styles */
         .exchange-content {
             flex: 1;
-            max-width: calc(100% - 250px);
+            max-width: calc(100% - 80px);
         }
 
         .page-title {
@@ -82,8 +163,7 @@
             margin-bottom: 2rem;
         }
 
-        /* Active Swaps Section */
-        .active-swaps, .swap-history, .feedback-reminders, .dispute-support {
+        .pending-swaps, .active-swaps, .swap-history, .feedback-reminders, .dispute-support {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             padding: 1.5rem;
@@ -135,6 +215,7 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 1rem;
+            flex-wrap: wrap;
         }
 
         .swap-details p {
@@ -146,6 +227,8 @@
         .swap-actions {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .swap-actions button {
@@ -158,11 +241,27 @@
             transition: background 0.3s ease;
         }
 
-        .swap-actions button:hover {
-            background: #2980b9;
+        .swap-actions button:disabled {
+            background: #666;
+            cursor: not-allowed;
         }
 
-        /* Feedback Reminders */
+        .swap-actions button:hover:not(:disabled) {
+            background: #333333;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            color: white;
+            margin-left: 0.5rem;
+        }
+
+        .pending { background: #e67e22; }
+        .active { background: #2ecc71; }
+        .completed { background: #3498db; }
+
         .feedback-card {
             background: rgba(255, 255, 255, 0.1);
             padding: 1rem;
@@ -176,7 +275,6 @@
             opacity: 0.8;
         }
 
-        /* Dispute Support */
         .dispute-card {
             background: rgba(255, 255, 255, 0.1);
             padding: 1rem;
@@ -201,74 +299,200 @@
         }
 
         .dispute-card button:hover {
-            background: #2980b9;
+            background: #333333;
+        }
+
+        .swap-info {
+            font-size: 0.9rem;
+            color: var(--primary);
+            opacity: 0.8;
+            margin: 0.5rem 0;
+        }
+
+        .empty-state {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        /* Swap History Card Specific Styles */
+        .swap-history-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid #3498db;
+        }
+
+        .swap-history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .swap-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .swap-history-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .swap-history-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--primary);
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .swap-history-details {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .swap-history-details p {
+            margin: 0.3rem 0;
+            opacity: 0.9;
+        }
+
+        .swap-history-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .swap-history-earned {
+            font-size: 0.9rem;
+            color: #2ecc71;
+            font-weight: 500;
+        }
+
+        .swap-history-view-details {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .swap-history-view-details:hover {
+            background: #333333;
+        }
+
+        /* Responsive Styles from dashboard.html */
+        @media (max-width: 768px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: space-around;
+                padding: 1rem;
+            }
+
+            .exchange-content {
+                max-width: 100%;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .nav-link::after {
+                display: none;
+            }
+
+            .sidebar-logo {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <h2>SkillSwap</h2>
+            <h2 class="sidebar-logo">SkillSwap</h2>
             <ul class="sidebar-nav">
                 <li class="nav-item">
-                    <a href="dashboard.html" class="nav-link">
+                    <a href="dashboard.html" class="nav-link" data-tooltip="Dashboard">
                         <i class="nav-icon fas fa-home"></i>
-                        Dashboard
+                        <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="profile.html" class="nav-link">
+                    <a href="profile.html" class="nav-link" data-tooltip="My Profile">
                         <i class="nav-icon fas fa-user"></i>
-                        My Profile
+                        <span class="nav-text">My Profile</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="search.html" class="nav-link">
+                    <a href="search.html" class="nav-link" data-tooltip="Search Skills">
                         <i class="nav-icon fas fa-search"></i>
-                        Search Skills
+                        <span class="nav-text">Search Skills</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="exchange.html" class="nav-link active">
+                    <a href="exchange.html" class="nav-link active" data-tooltip="My Exchanges">
                         <i class="nav-icon fas fa-exchange-alt"></i>
-                        My Exchanges
+                        <span class="nav-text">My Exchanges</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="messages.html" class="nav-link">
+                    <a href="messages.html" class="nav-link" data-tooltip="Messages">
                         <i class="nav-icon fas fa-comments"></i>
-                        Messages
-                        <span class="notification-badge"></span>
+                        <span class="nav-text">Messages</span>
+                        <!-- <span class="notification-badge" id="unreadMessagesBadge"></span> -->
                     </a>
                 </li>
+
                 <li class="nav-item">
-                    <a href="reviews.html" class="nav-link">
-                        <i class="nav-icon fas fa-star"></i>
-                        Reviews
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="setting.html" class="nav-link">
+                    <a href="settings.html" class="nav-link" data-tooltip="Settings">
                         <i class="nav-icon fas fa-cog"></i>
-                        Settings
+                        <span class="nav-text">Settings</span>
                     </a>
                 </li>
                 <li class="nav-item" style="margin-top: 2rem;">
-                    <a href="login.html" class="nav-link">
+                    <a href="#" class="nav-link" onclick="logout()" data-tooltip="Logout">
                         <i class="nav-icon fas fa-sign-out-alt"></i>
-                        Logout
+                        <span class="nav-text">Logout</span>
                     </a>
                 </li>
             </ul>
         </nav>
 
-        <!-- Exchange Content -->
         <div class="exchange-content">
             <h1 class="page-title">My Exchanges</h1>
-            <p class="page-subtitle">Track Your Skill Journey</p>
+            <p class="page-subtitle">Track Your Skill Swaps</p>
 
-            <!-- Active Swaps Section -->
+            <div class="pending-swaps">
+                <h2 class="section-title">Pending Swaps</h2>
+                <div id="pendingSwapsList">
+                    <!-- Pending swaps will be dynamically added here -->
+                </div>
+            </div>
+
             <div class="active-swaps">
                 <h2 class="section-title">Active Swaps</h2>
                 <div id="activeSwapsList">
@@ -276,7 +500,6 @@
                 </div>
             </div>
 
-            <!-- Swap History Section -->
             <div class="swap-history">
                 <h2 class="section-title">Swap History</h2>
                 <div id="swapHistoryList">
@@ -284,54 +507,276 @@
                 </div>
             </div>
 
-            <!-- Feedback Reminders Section -->
             <div class="feedback-reminders">
                 <h2 class="section-title">Feedback Reminders</h2>
-                <div class="feedback-card">
-                    <p>Leave a review for your Spanish lessons with Maria.</p>
-                    <button>Leave Feedback</button>
+                <div id="feedbackRemindersList">
+                    <p>No feedback reminders yet.</p>
                 </div>
             </div>
 
-            <!-- Dispute Support Section -->
             <div class="dispute-support">
                 <h2 class="section-title">Dispute Support</h2>
-                <div class="dispute-card">
-                    <p>Having issues with an exchange? Flag it for our team to mediate.</p>
-                    <button>Flag Issue</button>
+                <div id="disputeSupportList">
+                    <div class="dispute-card">
+                        <p>Having issues with an exchange? Flag it for our team to mediate.</p>
+                        <button onclick="alert('Dispute support coming soon!')">Flag Issue</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Retrieve contract data from localStorage
-        const contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+        // Dynamically connect to SocketIO using the current host
+        const socket = io(window.location.origin, {
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+        });
+        let currentUserId = null;
 
-        // Display active swaps
-        const activeSwapsList = document.getElementById('activeSwapsList');
-        contracts.forEach(contract => {
-            const swapCard = document.createElement('div');
-            swapCard.classList.add('swap-card');
-            swapCard.innerHTML = `
-                <h3>${contract.skill} with ${contract.partner}</h3>
-                <div class="progress-bar">
-                    <div class="progress-bar-fill" style="width: 0%;"></div>
-                </div>
-                <div class="swap-details">
-                    <p>0/${contract.sessions} sessions completed</p>
-                    <div class="swap-actions">
-                        <button>View Details</button>
-                        <button>Mark Complete</button>
-                    </div>
-                </div>
-            `;
-            activeSwapsList.appendChild(swapCard);
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+            if (currentUserId) socket.emit('join_room', { room: currentUserId });
         });
 
-        // Display swap history (if any)
-        const swapHistoryList = document.getElementById('swapHistoryList');
-        // Add logic to display completed swaps here
+        socket.on('new_contract', (data) => {
+            console.log('New contract received:', data);
+            fetchContracts();
+        });
+
+        socket.on('contract_accepted', (data) => {
+            console.log('Contract accepted:', data);
+            fetchContracts();
+        });
+
+        socket.on('session_updated', (data) => {
+            console.log('Session updated:', data);
+            fetchContracts();
+        });
+
+        socket.on('finish_requested', (data) => {
+            console.log('Finish requested:', data);
+            alert('Your swap partner has requested to finish the contract.');
+            fetchContracts();
+        });
+
+        socket.on('contract_completed', (data) => {
+            console.log('Contract completed:', data);
+            alert('Contract completed successfully! Check your skill hours.');
+            fetchContracts();
+        });
+
+        async function fetchCurrentUserId() {
+            try {
+                const response = await fetch('/api/profile', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUserId = data.id;
+                    socket.emit('join_room', { room: currentUserId });
+                } else {
+                    console.error('Failed to fetch user ID:', await response.text());
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function fetchContracts() {
+            try {
+                const response = await fetch('/api/get_contracts', { credentials: 'include' });
+                if (response.ok) {
+                    const { contracts } = await response.json();
+                    displayContracts(contracts);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to fetch contracts:', errorData.error);
+                    alert('Failed to load contracts. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error fetching contracts:', error);
+                alert('Error loading contracts. Please try again.');
+            }
+        }
+
+        function displayContracts(contracts) {
+            const pendingList = document.getElementById('pendingSwapsList');
+            const activeList = document.getElementById('activeSwapsList');
+            const historyList = document.getElementById('swapHistoryList');
+            const feedbackList = document.getElementById('feedbackRemindersList');
+
+            pendingList.innerHTML = '';
+            activeList.innerHTML = '';
+            historyList.innerHTML = '';
+            feedbackList.innerHTML = '';
+
+            contracts.forEach(contract => {
+                const isSender = contract.sender_id === currentUserId;
+                const senderProgress = (contract.sender_sessions_completed / contract.total_sessions) * 100;
+                const receiverProgress = (contract.receiver_sessions_completed / contract.total_sessions) * 100;
+                const overallProgress = ((contract.sender_sessions_completed + contract.receiver_sessions_completed) / (contract.total_sessions * 2)) * 100;
+
+                const userSessionsCompleted = isSender ? contract.sender_sessions_completed : contract.receiver_sessions_completed;
+                const canMarkSession = userSessionsCompleted < contract.total_sessions;
+
+                const swapCard = document.createElement('div');
+                swapCard.classList.add('swap-card');
+                swapCard.innerHTML = `
+                    <h3>
+                        ${isSender ? 'Your' : 'Their'} ${contract.sender_skill_offered || 'Unknown Skill'} for 
+                        ${isSender ? 'Their' : 'Your'} ${contract.receiver_skill_offered || 'Unknown Skill'} 
+                        with ${contract.partner || 'Unknown User'} 
+                        <span class="status-badge ${contract.status}">${contract.status}</span>
+                    </h3>
+                    <div class="swap-info">
+                        <p>Frequency: ${contract.frequency || 'N/A'} | Duration: ${contract.session_duration || 60} min | Mode: ${contract.mode || 'N/A'}</p>
+                        <p>${contract.mode === 'online' && contract.platform ? 'Platform: ' + contract.platform : contract.mode === 'in-person' && contract.location ? 'Location: ' + contract.location : ''}</p>
+                        ${contract.terms ? `<p>Terms: ${contract.terms}</p>` : ''}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: ${overallProgress}%"></div>
+                    </div>
+                    <div class="swap-details">
+                        <div>
+                            <p>Your Sessions: ${userSessionsCompleted}/${contract.total_sessions}</p>
+                            <p>Their Sessions: ${isSender ? contract.receiver_sessions_completed : contract.sender_sessions_completed}/${contract.total_sessions}</p>
+                            <p>Total Hours Spent: ${(contract.hours_spent || 0).toFixed(1)}</p>
+                        </div>
+                        <div class="swap-actions">
+                            ${contract.status === 'pending' && !isSender ? `
+                                <button onclick="acceptContract('${contract.contract_id}')">Accept</button>
+                            ` : contract.status === 'pending' && isSender ? `
+                                <p>Awaiting ${contract.partner || 'partner'}'s approval</p>
+                            ` : ''}
+                            ${contract.status === 'active' ? `
+                                <button onclick="markSessionComplete('${contract.contract_id}', '${isSender ? 'sender_skill' : 'receiver_skill'}')" ${!canMarkSession ? 'disabled' : ''}>
+                                    Mark My Session
+                                </button>
+                                <button onclick="finishContract('${contract.contract_id}')">Finish</button>
+                                ${contract.sender_confirmed_finish || contract.receiver_confirmed_finish ? '<p>Awaiting partner confirmation</p>' : ''}
+                            ` : ''}
+                            ${contract.status === 'completed' ? `
+                                <p>Completed on ${contract.completed_at ? new Date(contract.completed_at).toLocaleDateString() : 'N/A'} | Skill Hours Earned: ${contract.skill_hours_exchange || 0}</p>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                if (contract.status === 'pending') {
+                    pendingList.appendChild(swapCard);
+                } else if (contract.status === 'active') {
+                    activeList.appendChild(swapCard);
+                } else if (contract.status === 'completed') {
+                    historyList.appendChild(swapCard);
+                    const userFeedback = isSender ? contract.sender_feedback : contract.receiver_feedback;
+                    if (!userFeedback) {
+                        const feedbackCard = document.createElement('div');
+                        feedbackCard.classList.add('feedback-card');
+                        feedbackCard.innerHTML = `
+                            <p>Provide feedback for your swap with ${contract.partner || 'Unknown User'} (${contract.sender_skill_offered || 'Unknown Skill'}/${contract.receiver_skill_offered || 'Unknown Skill'})</p>
+                            <button onclick="alert('Feedback submission coming soon!')">Submit Feedback</button>
+                        `;
+                        feedbackList.appendChild(feedbackCard);
+                    }
+                }
+            });
+
+            if (pendingList.children.length === 0) pendingList.innerHTML = '<div class="empty-state"><p>No pending swaps.</p></div>';
+            if (activeList.children.length === 0) activeList.innerHTML = '<div class="empty-state"><p>No active swaps.</p></div>';
+            if (historyList.children.length === 0) historyList.innerHTML = '<div class="empty-state"><p>No swap history.</p></div>';
+            if (feedbackList.children.length === 0) feedbackList.innerHTML = '<div class="empty-state"><p>No feedback reminders yet.</p></div>';
+        }
+
+        async function acceptContract(contractId) {
+            try {
+                const response = await fetch('/api/accept_contract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contract_id: contractId }),
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    alert('Contract accepted! It’s now active.');
+                    fetchContracts();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to accept contract: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error accepting contract:', error);
+                alert('Error accepting contract. Please try again.');
+            }
+        }
+
+        async function markSessionComplete(contractId, skillType) {
+            try {
+                const response = await fetch('/api/mark_session_complete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contract_id: contractId, skill_type: skillType }),
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`Session marked complete: ${data.sender_sessions_completed}/${data.total_sessions} (sender), ${data.receiver_sessions_completed}/${data.total_sessions} (receiver)`);
+                    fetchContracts();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to mark session: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error marking session:', error);
+                alert('Error marking session. Please try again.');
+            }
+        }
+
+        async function finishContract(contractId) {
+            try {
+                const response = await fetch('/api/finish_contract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contract_id: contractId }),
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    alert('Finish request submitted. Awaiting partner confirmation.');
+                    fetchContracts();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Failed to finish contract: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error finishing contract:', error);
+                alert('Error finishing contract. Please try again.');
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    console.error('Failed to logout:', await response.text());
+                    alert('Failed to logout. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                alert('Error logging out. Please try again.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchCurrentUserId();
+            fetchContracts();
+        });
     </script>
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
